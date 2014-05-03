@@ -7,6 +7,8 @@ from rest_framework import routers
 from rest_framework import status
 
 
+# SessionMixin just allows us to instantiate the
+# SA session
 class ModelManager(SessionMixin, AlchemyModelManager):
     model_class = TestModel
 
@@ -25,3 +27,4 @@ class TestAlchemyViewSet(TestCase):
         resp = self.client.get('/api/testmodels/')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
+        print resp
