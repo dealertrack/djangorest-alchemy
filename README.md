@@ -4,7 +4,7 @@ djangorest-alchemy
 Install dependencies
 --------------------
 ```
-pip install -r requires_install.txt
+pip install -r requirements.txt
 ```
 
 Run tests
