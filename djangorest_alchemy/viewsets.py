@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-from .. serializers import AlchemySerializer
+from djangorest_alchemy.serializers import AlchemyModelSerializer
 
 
-class AlchemyViewSet(viewsets.ViewSet):
+class AlchemyModelViewSet(viewsets.ViewSet):
     """
     Generic SQLAlchemy viewset which calls
     methods over the specified manager_class and
@@ -11,9 +11,12 @@ class AlchemyViewSet(viewsets.ViewSet):
     """
 
     def list(self, request):
+        assert hasattr(self, 'manager_class'), \
+            "manager_class has to be specified"
+
         mgr = self.manager_class()
-        queryset = mgr.all()
-        serializer = AlchemySerializer(queryset)
+        queryset = mgr.list()
+        serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class())
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
