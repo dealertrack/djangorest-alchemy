@@ -12,7 +12,17 @@ class AlchemyModelSerializer(serializers.Serializer):
 
     field_mapping = {
         String: CharField,
-        INTEGER: IntegerField
+        INTEGER: IntegerField,
+        SMALLINT: IntegerField,
+        BIGINT: IntegerField,
+        VARCHAR: CharField,
+        CHAR: CharField,
+        TIMESTAMP: DateTimeField,
+        Float: FloatField,
+        BigInteger: IntegerField,
+        Numeric: IntegerField,
+        DateTime: DateTimeField,
+        Boolean: BooleanField,
     }
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +39,9 @@ class AlchemyModelSerializer(serializers.Serializer):
         ret = SortedDict()
 
         for field in self.cls.__table__.columns:
+            assert field.type.__class__ in self.field_mapping, \
+                "Field %s has not been mapped"
+
             ret[field.name] = self.field_mapping[field.type.__class__]()
 
         return ret

@@ -20,7 +20,13 @@ class AlchemyModelViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        pass
+        assert hasattr(self, 'manager_class'), \
+            "manager_class has to be specified"
+
+        mgr = self.manager_class()
+        queryset = mgr.retrieve(pk)
+        serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class())
+        return Response(serializer.data)
 
     def create(self, request):
         pass

@@ -1,30 +1,65 @@
-from utils import SessionMixin, TestModel
+from utils import SessionMixin, DeclarativeModel, ClassicalModel
 from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet
 from django.test import TestCase
+import datetime
 
 from rest_framework import routers
 from rest_framework import status
 
 
-# SessionMixin just allows us to instantiate the
-# SA session
-class ModelManager(SessionMixin, AlchemyModelManager):
-    model_class = TestModel
+class DeclarativeModelManager(SessionMixin, AlchemyModelManager):
+    model_class = DeclarativeModel
 
 
-class ModelViewSet(AlchemyModelViewSet):
-    manager_class = ModelManager
+class DeclModelViewSet(AlchemyModelViewSet):
+    manager_class = DeclarativeModelManager
+
+
+class ClassicalModelManager(SessionMixin, AlchemyModelManager):
+    model_class = ClassicalModel
+
+
+class ClassicalModelViewSet(AlchemyModelViewSet):
+    manager_class = DeclarativeModelManager
+
 
 viewset_router = routers.DefaultRouter()
-viewset_router.register(r'api/testmodels', ModelViewSet, base_name='test')
+viewset_router.register(r'api/declmodels', DeclModelViewSet, base_name='test')
+viewset_router.register(r'api/clsmodels', ClassicalModelViewSet,
+                        base_name='test')
 urlpatterns = viewset_router.urls
 
 
 class TestAlchemyViewSet(TestCase):
 
-    def test_list(self):
-        resp = self.client.get('/api/testmodels/')
+    def test_decl_list(self):
+        resp = self.client.get('/api/declmodels/')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
-        print resp
+        print resp.data
+
+    def test_decl_retrieve(self):
+        resp = self.client.get('/api/declmodels/1/')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(not type(resp.data) is list)
+        self.assertEqual(resp.data['id'], 1)
+        self.assertEqual(resp.data['field'], 'test')
+        self.assertTrue(type(resp.data['datetime']) is datetime.datetime)
+        self.assertTrue(type(resp.data['floatfield']) is float)
+        self.assertTrue(type(resp.data['bigintfield']) is long)
+
+    def test_classical_list(self):
+        resp = self.client.get('/api/clsmodels/')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+
+    def test_classical_retrieve(self):
+        resp = self.client.get('/api/clsmodels/1/')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(not type(resp.data) is list)
+        self.assertEqual(resp.data['id'], 1)
+        self.assertEqual(resp.data['field'], 'test')
+
+
+

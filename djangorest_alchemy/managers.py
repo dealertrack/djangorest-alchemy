@@ -14,3 +14,6 @@ class AlchemyModelManager(object):
     def list(self, filters=None):
         return self.session.query(self.cls).all()
 
+    def retrieve(self, pk):
+        return self.session.query(self.cls).get(pk)
+

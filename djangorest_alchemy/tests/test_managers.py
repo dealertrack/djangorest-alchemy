@@ -1,11 +1,11 @@
 
 import unittest
 from djangorest_alchemy.managers import AlchemyModelManager
-from utils import SessionMixin, TestModel
+from utils import SessionMixin, DeclarativeModel
 
 
 class ModelManager(SessionMixin, AlchemyModelManager):
-    model_class = TestModel
+    model_class = DeclarativeModel
 
 
 class TestAlchemyModelManager(unittest.TestCase):
