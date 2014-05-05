@@ -50,7 +50,7 @@ class TestAlchemyViewSet(TestCase):
         self.assertEqual(resp.data['field'], 'test')
         self.assertIsInstance(resp.data['datetime'], datetime.datetime)
         self.assertIsInstance(resp.data['floatfield'], float)
-        self.assertIsInstance(resp.data['bigintfield'], long)
+        self.assertTrue(isinstance(resp.data['bigintfield'], (int, long)))
 
     def test_classical_list(self):
         resp = self.client.get('/api/clsmodels/')
