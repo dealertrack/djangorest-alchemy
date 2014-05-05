@@ -41,7 +41,6 @@ class TestAlchemyViewSet(TestCase):
         resp = self.client.get('/api/declmodels/')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
-        print resp.data
 
     def test_decl_retrieve(self):
         resp = self.client.get('/api/declmodels/1/')
@@ -49,9 +48,9 @@ class TestAlchemyViewSet(TestCase):
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['id'], 1)
         self.assertEqual(resp.data['field'], 'test')
-        self.assertTrue(type(resp.data['datetime']) is datetime.datetime)
-        self.assertTrue(type(resp.data['floatfield']) is float)
-        self.assertTrue(type(resp.data['bigintfield']) is long)
+        self.assertIsInstance(resp.data['datetime'], datetime.datetime)
+        self.assertIsInstance(resp.data['floatfield'], float)
+        self.assertIsInstance(resp.data['bigintfield'], long)
 
     def test_classical_list(self):
         resp = self.client.get('/api/clsmodels/')
