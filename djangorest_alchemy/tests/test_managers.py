@@ -1,4 +1,7 @@
 
+'''
+Unit test cases for AlchemyModelManager
+'''
 import unittest
 from djangorest_alchemy.managers import AlchemyModelManager
 from utils import SessionMixin, DeclarativeModel

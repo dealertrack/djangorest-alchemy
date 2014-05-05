@@ -1,3 +1,7 @@
+'''
+Model and manager test dummies
+'''
+
 from sqlalchemy import create_engine
 from sqlalchemy import *
 from sqlalchemy.types import *

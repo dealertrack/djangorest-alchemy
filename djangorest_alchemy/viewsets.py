@@ -1,3 +1,8 @@
+'''
+Base AlchemyViewSet which provides
+the necessary plumbing to interface with
+AlchemyModelSerializer and AlchemyModelManager
+'''
 from rest_framework import viewsets
 from rest_framework.response import Response
 from djangorest_alchemy.serializers import AlchemyModelSerializer

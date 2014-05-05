@@ -4,7 +4,7 @@ djangorest-alchemy
 
 .. image:: https://badge.fury.io/py/djangorest-alchemy.png
     :target: http://badge.fury.io/py/djangorest-alchemy
-
+    
 .. image:: https://travis-ci.org/iagore/djangorest-alchemy.png?branch=master
         :target: https://travis-ci.org/iagore/djangorest-alchemy
 
@@ -21,18 +21,3 @@ Features
 --------
 
 * TODO
-
-Install dependencies
---------------------
-```
-pip install -r requirements.txt
-```
-
-Run tests
----------
-```
-DJANGO_SETTINGS_MODULE=djangorest_alchemy.settings nosetests -v
-```
-
-
-

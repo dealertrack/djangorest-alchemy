@@ -1,3 +1,7 @@
+'''
+Integration test cases for AlchemyModelViewSet
+Uses Django test client
+'''
 from utils import SessionMixin, DeclarativeModel, ClassicalModel
 from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet

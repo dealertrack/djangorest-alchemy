@@ -1,3 +1,7 @@
+'''
+Base AlchemyModelSerializer which provides the mapping between
+SQLALchemy and DRF fields to serialize/deserialize objects
+'''
 from rest_framework import serializers
 from rest_framework.fields import *
 from sqlalchemy.types import *
