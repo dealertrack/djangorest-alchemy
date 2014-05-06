@@ -39,10 +39,6 @@ class ChildModel(Base):
 class DeclarativeModel(Base):
     __tablename__ = 'test_model'
 
-    # described the fields to be used as navigational
-    # for serialization/deserialization purposes
-    navigational_fields = ['child_model']
-
     id = Column(INTEGER, primary_key=True)
     field = Column(String)
     datetime = Column(DateTime, default=datetime.datetime.utcnow)
