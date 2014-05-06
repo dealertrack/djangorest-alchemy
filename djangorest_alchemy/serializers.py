@@ -3,10 +3,12 @@ Base AlchemyModelSerializer which provides the mapping between
 SQLALchemy and DRF fields to serialize/deserialize objects
 '''
 from rest_framework import serializers
+from rest_framework.relations import *
 from rest_framework.fields import *
 from sqlalchemy.types import *
 from sqlalchemy import *
 from django.utils.datastructures import SortedDict
+from djangorest_alchemy.fields import AlchemyRelatedField
 
 
 class AlchemyModelSerializer(serializers.Serializer):
@@ -48,8 +50,11 @@ class AlchemyModelSerializer(serializers.Serializer):
 
             ret[field.name] = self.field_mapping[field.type.__class__]()
 
-        return ret
+        if hasattr(self.cls, 'navigational_fields'):
+            for fld_name in self.cls.navigational_fields:
+                ret[fld_name] = AlchemyRelatedField(source=fld_name)
 
+        return ret
 
 
 

@@ -68,6 +68,7 @@ class TestAlchemyViewSet(TestCase):
 
     def test_decl_retrieve(self):
         resp = self.client.get('/api/declmodels/1/')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['id'], 1)
