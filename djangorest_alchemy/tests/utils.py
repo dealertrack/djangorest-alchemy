@@ -36,6 +36,16 @@ class DeclarativeModel(Base):
     bigintfield = Column(BigInteger)
 
 
+#Multiple primary keys
+class CompositeKeysModel(Base):
+    __tablename__ = 'composite_model'
+
+    id = Column(INTEGER, primary_key=True)
+    pk1 = Column(String, primary_key=True)
+    pk2 = Column(String, primary_key=True)
+    field = Column(String)
+
+
 # Classical style
 class ClassicalModel(object):
     pass
@@ -53,6 +63,13 @@ t.floatfield = 1.2345
 t.bigintfield = 1234567890123456789
 session = Session()
 session.add(t)
+session.commit()
+
+c = CompositeKeysModel()
+c.id = 1
+c.pk1 = 'ABCD'
+c.pk2 = 'WXYZ'
+session.add(c)
 session.commit()
 
 

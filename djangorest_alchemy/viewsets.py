@@ -29,7 +29,17 @@ class AlchemyModelViewSet(viewsets.ViewSet):
             "manager_class has to be specified"
 
         mgr = self.manager_class()
-        queryset = mgr.retrieve(pk)
+
+        if hasattr(self, 'get_other_pks'):
+            pks = self.get_other_pks(request)
+            new = pks.values()
+            new.sort()  # This sort is a hack for now, need to use
+            # correct PK order from the model itself
+            all_pks = tuple(pk) + tuple(new)
+            queryset = mgr.retrieve(all_pks)
+        else:
+            queryset = mgr.retrieve(pk)
+
         serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class())
         return Response(serializer.data)
 
