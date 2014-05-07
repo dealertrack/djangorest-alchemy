@@ -100,7 +100,7 @@ class TestAlchemyViewSet(TestCase):
 
     @unittest.skip("Not implemented yet - working hard for TDD ;-) !!! ")
     def test_hierarchical_multiple_pk_retrieve(self):
-        resp = self.client.get('/api/rootmodels/1/childmodels/2/',
+        resp = self.client.get('/api/declmodels/1/childmodels/2/',
                                PK1='ABCD', PK2='WXYZ')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
 

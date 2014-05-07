@@ -10,7 +10,9 @@ from sqlalchemy import *
 from django.utils.datastructures import SortedDict
 from djangorest_alchemy.fields import AlchemyRelatedField
 # inspect introduced in 0.8
-from sqlalchemy import inspect
+#from sqlalchemy import inspect
+from sqlalchemy.orm import class_mapper
+from sqlalchemy.orm.properties import RelationshipProperty
 
 
 class AlchemyModelSerializer(serializers.Serializer):
@@ -54,10 +56,11 @@ class AlchemyModelSerializer(serializers.Serializer):
             ret[field.name] = self.field_mapping[field.type.__class__]()
 
         # Get all the relationship fields
-        mapper = inspect(self.cls.__class__)
-        for rel_prop in mapper.relationships:
-            field_nm = str(rel_prop).split('.')[1]
-            ret[field_nm] = AlchemyRelatedField(source=field_nm)
+        mapper = class_mapper(self.cls.__class__)
+        for rel_prop in mapper.iterate_properties:
+            if isinstance(rel_prop, RelationshipProperty):
+                field_nm = str(rel_prop).split('.')[1]
+                ret[field_nm] = AlchemyRelatedField(source=field_nm)
 
         return ret
 
