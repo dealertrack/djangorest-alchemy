@@ -3,7 +3,6 @@ Base for interfacing with SQLAlchemy
 Provides the necessary plumbing for CRUD
 using SA session
 '''
-from sqlalchemy.orm import joinedload_all
 
 
 class AlchemyModelManager(object):
@@ -25,11 +24,5 @@ class AlchemyModelManager(object):
         return self.session.query(self.cls).all()
 
     def retrieve(self, pk):
-        query = self.session.query(self.cls)
-
-        if hasattr(self.cls, 'navigational_fields'):
-            nav_fields = '.'.join(self.cls.navigational_fields)
-            query = query.options(joinedload_all(nav_fields))
-
-        return query.get(pk)
+        return self.session.query(self.cls).get(pk)
 

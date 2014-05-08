@@ -40,7 +40,9 @@ class AlchemyModelViewSet(viewsets.ViewSet):
 
         mgr = self.manager_class()
         queryset = mgr.list()
-        serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class())
+        serializer = AlchemyModelSerializer(queryset,
+                                            model_class=mgr.model_class(),
+                                            context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
@@ -50,7 +52,8 @@ class AlchemyModelViewSet(viewsets.ViewSet):
         mgr = self.manager_class()
         queryset = mgr.retrieve(self.get_pks(request, pk))
 
-        serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class())
+        serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class(),
+                                            context={'request': request})
         return Response(serializer.data)
 
     def create(self, request):

@@ -29,7 +29,7 @@ cls_test = Table('classical_test', metadata,
 class ChildModel(Base):
     __tablename__ = 'child_model'
 
-    child_model_id = Column(INTEGER, primary_key=True)
+    childmodel_id = Column(INTEGER, primary_key=True)
     parent_id = Column(INTEGER,
                        ForeignKey("test_model.id"),
                        primary_key=True,)
@@ -67,6 +67,7 @@ mapper(ClassicalModel, cls_test)
 
 
 Base.metadata.create_all(bind=engine)
+metadata.create_all(bind=engine)
 
 t = DeclarativeModel()
 t.id = 1
@@ -75,7 +76,7 @@ t.floatfield = 1.2345
 t.bigintfield = 1234567890123456789
 
 t.child_model = ChildModel()
-t.child_model.child_model_id = 2
+t.child_model.childmodel_id = 2
 t.child_model.parent_id = 1
 
 session = Session()
@@ -87,6 +88,12 @@ c.id = 1
 c.pk1 = 'ABCD'
 c.pk2 = 'WXYZ'
 session.add(c)
+session.commit()
+
+cl = ClassicalModel()
+cl.id = 1
+cl.field = 'test'
+session.add(cl)
 session.commit()
 
 

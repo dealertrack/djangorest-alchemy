@@ -12,7 +12,7 @@ from djangorest_alchemy.fields import AlchemyRelatedField
 # inspect introduced in 0.8
 #from sqlalchemy import inspect
 from sqlalchemy.orm import class_mapper
-from sqlalchemy.orm.properties import RelationshipProperty
+from sqlalchemy.orm.properties import RelationshipProperty, ColumnProperty
 
 
 class AlchemyModelSerializer(serializers.Serializer):
@@ -48,19 +48,28 @@ class AlchemyModelSerializer(serializers.Serializer):
 
         ret = SortedDict()
 
-        # Get all the Column fields
-        for field in self.cls.__table__.columns:
-            assert field.type.__class__ in self.field_mapping, \
-                "Field %s has not been mapped"
+        mapper = class_mapper(self.cls.__class__)
 
-            ret[field.name] = self.field_mapping[field.type.__class__]()
+        # Get all the Column fields
+        for col_prop in mapper.iterate_properties:
+            if isinstance(col_prop, ColumnProperty):
+                field_nm = str(col_prop).split('.')[1]
+                field_cls = col_prop.columns[0].type.__class__
+
+                assert field_cls in self.field_mapping, \
+                    "Field %s has not been mapped"
+
+                ret[field_nm] = self.field_mapping[field_cls]()
 
         # Get all the relationship fields
-        mapper = class_mapper(self.cls.__class__)
         for rel_prop in mapper.iterate_properties:
             if isinstance(rel_prop, RelationshipProperty):
                 field_nm = str(rel_prop).split('.')[1]
-                ret[field_nm] = AlchemyRelatedField(source=field_nm)
+                # many becomes same as uselist so that
+                # RelatedField can iterate over the queryset
+                ret[field_nm] = AlchemyRelatedField(source=field_nm,
+                                                    many=rel_prop.uselist,
+                                                    request=self.context['request'])
 
         return ret
 
