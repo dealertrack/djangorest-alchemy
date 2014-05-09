@@ -26,10 +26,10 @@ setup(
     author_email='ashish.gore@dealertrack.com',
     url='https://github.com/iagore/djangorest-alchemy',
     packages=[
-        'djangorest-alchemy',
+        'djangorest_alchemy',
     ],
-    package_dir={'djangorest-alchemy':
-                 'djangorest-alchemy'},
+    package_dir={'djangorest_alchemy':
+                 'djangorest_alchemy'},
     include_package_data=True,
     install_requires=[
     ],

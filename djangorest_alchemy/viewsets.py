@@ -15,24 +15,19 @@ class AlchemyModelViewSet(viewsets.ViewSet):
     uses specified serializer_class
     """
 
-    def get_pks(self, request, pk=None):
+    def get_other_pks(self, request):
         '''
-        You can override this to
-        * Return back tuple() of pks
-          in case of multiple keys
-        * OR scalar pk in case of single key
+        Return default empty {}
+        '''
+        return {}
 
-        You can also add a mixin just to implement get_other_pks
-        and return back dictionary of PKs
+    def get_pks(self, request, **kwargs):
         '''
-        if hasattr(self, 'get_other_pks'):
-            pks = self.get_other_pks(request)
-            new = pks.values()
-            new.sort()  # This sort is a hack for now, need to use
-            # correct PK order from the model itself
-            return tuple(pk) + tuple(new)
-        else:
-            return pk
+        Return list of pks
+        from the URI
+        e.g. /models/pk1/childmodel/pk2 return back [pk1, pk2]
+        '''
+        return kwargs.values()
 
     def list(self, request):
         assert hasattr(self, 'manager_class'), \
@@ -45,12 +40,12 @@ class AlchemyModelViewSet(viewsets.ViewSet):
                                             context={'request': request})
         return Response(serializer.data)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, **kwargs):
         assert hasattr(self, 'manager_class'), \
             "manager_class has to be specified"
 
-        mgr = self.manager_class()
-        queryset = mgr.retrieve(self.get_pks(request, pk))
+        mgr = self.manager_class(headers=self.get_other_pks(request))
+        queryset = mgr.retrieve(self.get_pks(request, **kwargs))
 
         serializer = AlchemyModelSerializer(queryset, model_class=mgr.model_class(),
                                             context={'request': request})

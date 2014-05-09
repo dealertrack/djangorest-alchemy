@@ -28,6 +28,7 @@ class AlchemyModelSerializer(serializers.Serializer):
         VARCHAR: CharField,
         CHAR: CharField,
         TIMESTAMP: DateTimeField,
+        DATE: DateTimeField,
         Float: FloatField,
         BigInteger: IntegerField,
         Numeric: IntegerField,
@@ -57,7 +58,7 @@ class AlchemyModelSerializer(serializers.Serializer):
                 field_cls = col_prop.columns[0].type.__class__
 
                 assert field_cls in self.field_mapping, \
-                    "Field %s has not been mapped"
+                    "Field %s has not been mapped" % field_cls
 
                 ret[field_nm] = self.field_mapping[field_cls]()
 

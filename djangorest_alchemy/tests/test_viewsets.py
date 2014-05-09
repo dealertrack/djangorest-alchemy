@@ -3,14 +3,15 @@ Integration test cases for AlchemyModelViewSet
 Uses Django test client
 '''
 from utils import SessionMixin, DeclarativeModel, ClassicalModel
-from utils import CompositeKeysModel
+from utils import CompositeKeysModel, ChildModel
 from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet
 from django.test import TestCase
+from django.conf.urls import patterns, include, url
 import unittest
 import datetime
 
-from rest_framework import routers
+from rest_framework_nested import routers
 from rest_framework import status
 
 
@@ -49,14 +50,27 @@ class ModelViewSet(PrimaryKeyMixin, AlchemyModelViewSet):
     manager_class = ModelManager
 
 
-viewset_router = routers.DefaultRouter()
-viewset_router.register(r'api/declmodels', DeclModelViewSet, base_name='test')
-viewset_router.register(r'api/clsmodels', ClassicalModelViewSet,
-                        base_name='test')
-viewset_router.register(r'api/compositemodels', ModelViewSet,
-                        base_name='test')
+class ChildModelManager(SessionMixin, AlchemyModelManager):
+    model_class = ChildModel
 
-urlpatterns = viewset_router.urls
+
+class ChildModelViewSet(AlchemyModelViewSet):
+    manager_class = ChildModelManager
+
+viewset_router = routers.SimpleRouter()
+viewset_router.register(r'api/declmodels', DeclModelViewSet, base_name='test-decl')
+viewset_router.register(r'api/clsmodels', ClassicalModelViewSet,
+                        base_name='test-cls')
+viewset_router.register(r'api/compositemodels', ModelViewSet,
+                        base_name='test-composite')
+
+child_router = routers.NestedSimpleRouter(viewset_router, r'api/declmodels', lookup='declmodels')
+child_router.register("childmodels", ChildModelViewSet, base_name='test-childmodel')
+
+urlpatterns = patterns('',
+                       url(r'^', include(viewset_router.urls)),
+                       url(r'^', include(child_router.urls)),
+                       )
 
 
 class TestAlchemyViewSet(TestCase):
@@ -97,7 +111,6 @@ class TestAlchemyViewSet(TestCase):
         self.assertEqual(resp.data['pk1'], 'ABCD')
         self.assertEqual(resp.data['pk2'], 'WXYZ')
 
-    @unittest.skip("Not implemented yet - working hard for TDD ;-) !!! ")
     def test_hierarchical_multiple_pk_retrieve(self):
         resp = self.client.get('/api/declmodels/1/childmodels/2/',
                                PK1='ABCD', PK2='WXYZ')
