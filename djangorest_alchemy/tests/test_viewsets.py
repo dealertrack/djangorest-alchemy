@@ -165,4 +165,4 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
         viewset = MockViewSet()
         pks = viewset.get_other_pks(mock.Mock())
         self.assertIsNotNone(pks)
-        self.assertNotIn('pk1', pks)
+        self.assertTrue(pks is {})
