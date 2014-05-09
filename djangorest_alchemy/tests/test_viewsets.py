@@ -8,8 +8,9 @@ from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet
 from django.test import TestCase
 from django.conf.urls import patterns, include, url
-import unittest
 import datetime
+import mock
+import unittest
 
 from rest_framework_nested import routers
 from rest_framework import status
@@ -64,6 +65,7 @@ viewset_router.register(r'api/clsmodels', ClassicalModelViewSet,
 viewset_router.register(r'api/compositemodels', ModelViewSet,
                         base_name='test-composite')
 
+# Register the child model
 child_router = routers.NestedSimpleRouter(viewset_router, r'api/declmodels', lookup='declmodels')
 child_router.register("childmodels", ChildModelViewSet, base_name='test-childmodel')
 
@@ -73,7 +75,7 @@ urlpatterns = patterns('',
                        )
 
 
-class TestAlchemyViewSet(TestCase):
+class TestAlchemyViewSetIntegration(TestCase):
 
     def test_decl_list(self):
         resp = self.client.get('/api/declmodels/')
@@ -115,4 +117,52 @@ class TestAlchemyViewSet(TestCase):
         resp = self.client.get('/api/declmodels/1/childmodels/2/',
                                PK1='ABCD', PK2='WXYZ')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertEqual(resp.data['childmodel_id'], 2)
+        self.assertEqual(resp.data['parent_id'], 1)
 
+
+class TestAlchemyViewSetUnit(unittest.TestCase):
+
+    def test_manager_factory(self):
+        '''
+        Test if manager_factory returns back appropriate instance
+        This shows how you can override manager_factory
+        and instantiate your own manager
+        '''
+        class MockManager(AlchemyModelManager):
+            model_class = mock.Mock()
+
+            def __init__(self, *args, **kwargs):
+                self.session = mock.Mock()
+                super(MockManager, self).__init__(*args, **kwargs)
+
+        class MockViewSet(AlchemyModelViewSet):
+            def manager_factory(self, *args, **kwargs):
+                return MockManager()
+
+        viewset = MockViewSet()
+        self.assertIsInstance(viewset.manager_factory(), MockManager)
+
+    def test_get_other_pks(self):
+        '''
+        Test override get_other_pks
+        and assert return value
+        '''
+        # Test overriding
+        class MockViewSet(AlchemyModelViewSet):
+            def get_other_pks(self, request):
+                return {'pk1': 'value'}
+
+        viewset = MockViewSet()
+        pks = viewset.get_other_pks(mock.Mock())
+        self.assertIsNotNone(pks)
+        self.assertIn('pk1', pks)
+
+        # Tese default implementation
+        class MockViewSet(AlchemyModelViewSet):
+            pass
+
+        viewset = MockViewSet()
+        pks = viewset.get_other_pks(mock.Mock())
+        self.assertIsNotNone(pks)
+        self.assertNotIn('pk1', pks)
