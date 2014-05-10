@@ -88,14 +88,14 @@ class TestAlchemyViewSetIntegration(TestCase):
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['declarativemodel_id'], '/api/declmodels/1/')
+        self.assertEqual(resp.data['declarativemodel_id'], 1)
         self.assertEqual(resp.data['field'], 'test')
         self.assertIsInstance(resp.data['datetime'], datetime.datetime)
         self.assertIsInstance(resp.data['floatfield'], float)
         self.assertTrue(isinstance(resp.data['bigintfield'], (int, long)))
 
     def test_classical_list(self):
-        resp = self.client.get('/api/clsmodels/')
+        resp = self.client.get('/api/clsmodels/?dummy=1')
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
@@ -105,7 +105,7 @@ class TestAlchemyViewSetIntegration(TestCase):
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['classicalmodel_id'], '/api/clsmodels/1/')
+        self.assertEqual(resp.data['classicalmodel_id'], 1)
         self.assertEqual(resp.data['field'], 'test')
 
     def test_with_multiple_pk_retrieve(self):
@@ -114,7 +114,7 @@ class TestAlchemyViewSetIntegration(TestCase):
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['compositekeysmodel_id'], '/api/compositemodels/1/')
+        self.assertEqual(resp.data['compositekeysmodel_id'], 1)
         self.assertEqual(resp.data['pk1'], 'ABCD')
         self.assertEqual(resp.data['pk2'], 'WXYZ')
 
@@ -123,7 +123,7 @@ class TestAlchemyViewSetIntegration(TestCase):
                                PK1='ABCD', PK2='WXYZ')
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertEqual(resp.data['childmodel_id'], '/api/declmodels/1/childmodels/2/')
+        self.assertEqual(resp.data['childmodel_id'], 2)
         self.assertEqual(resp.data['parent_id'], 1)
 
 
