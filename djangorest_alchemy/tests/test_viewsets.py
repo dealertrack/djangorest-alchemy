@@ -85,6 +85,7 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_decl_retrieve(self):
         resp = self.client.get('/api/declmodels/1/')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['declarativemodel_id'], '/api/declmodels/1/')
@@ -95,6 +96,7 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_classical_list(self):
         resp = self.client.get('/api/clsmodels/')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
 
