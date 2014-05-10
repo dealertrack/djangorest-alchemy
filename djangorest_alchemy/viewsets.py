@@ -5,7 +5,7 @@ AlchemyModelSerializer and AlchemyModelManager
 '''
 from rest_framework import viewsets
 from rest_framework.response import Response
-from djangorest_alchemy.serializers import AlchemyModelSerializer
+from djangorest_alchemy.serializers import AlchemyModelSerializer, AlchemyListSerializer
 
 
 class AlchemyModelViewSet(viewsets.ViewSet):
@@ -44,9 +44,9 @@ class AlchemyModelViewSet(viewsets.ViewSet):
 
         mgr = self.manager_factory()
         queryset = mgr.list()
-        serializer = AlchemyModelSerializer(queryset,
-                                            model_class=mgr.model_class(),
-                                            context={'request': request})
+        serializer = AlchemyListSerializer(queryset,
+                                           model_class=mgr.model_class(),
+                                           context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, **kwargs):

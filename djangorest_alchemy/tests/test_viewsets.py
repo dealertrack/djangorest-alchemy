@@ -79,6 +79,7 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_decl_list(self):
         resp = self.client.get('/api/declmodels/')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
 
@@ -86,7 +87,7 @@ class TestAlchemyViewSetIntegration(TestCase):
         resp = self.client.get('/api/declmodels/1/')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['id'], 1)
+        self.assertEqual(resp.data['declarativemodel_id'], '/api/declmodels/1/')
         self.assertEqual(resp.data['field'], 'test')
         self.assertIsInstance(resp.data['datetime'], datetime.datetime)
         self.assertIsInstance(resp.data['floatfield'], float)
@@ -99,25 +100,28 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_classical_retrieve(self):
         resp = self.client.get('/api/clsmodels/1/')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['id'], 1)
+        self.assertEqual(resp.data['classicalmodel_id'], '/api/clsmodels/1/')
         self.assertEqual(resp.data['field'], 'test')
 
     def test_with_multiple_pk_retrieve(self):
         resp = self.client.get('/api/compositemodels/1/',
                                PK1='ABCD', PK2='WXYZ')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
-        self.assertEqual(resp.data['id'], 1)
+        self.assertEqual(resp.data['compositekeysmodel_id'], '/api/compositemodels/1/')
         self.assertEqual(resp.data['pk1'], 'ABCD')
         self.assertEqual(resp.data['pk2'], 'WXYZ')
 
     def test_hierarchical_multiple_pk_retrieve(self):
         resp = self.client.get('/api/declmodels/1/childmodels/2/',
                                PK1='ABCD', PK2='WXYZ')
+        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertEqual(resp.data['childmodel_id'], 2)
+        self.assertEqual(resp.data['childmodel_id'], '/api/declmodels/1/childmodels/2/')
         self.assertEqual(resp.data['parent_id'], 1)
 
 

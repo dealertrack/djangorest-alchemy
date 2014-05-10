@@ -8,10 +8,11 @@ from rest_framework.fields import *
 from sqlalchemy.types import *
 from sqlalchemy import *
 from django.utils.datastructures import SortedDict
-from djangorest_alchemy.fields import AlchemyRelatedField
+from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
 #from sqlalchemy import inspect
 from sqlalchemy.orm import class_mapper
+from inspector import primary_key
 from sqlalchemy.orm.properties import RelationshipProperty, ColumnProperty
 
 
@@ -45,8 +46,6 @@ class AlchemyModelSerializer(serializers.Serializer):
 
     def get_default_fields(self):
 
-        assert not self.cls is None, 'model_class needs to be specified'
-
         ret = SortedDict()
 
         mapper = class_mapper(self.cls.__class__)
@@ -70,7 +69,26 @@ class AlchemyModelSerializer(serializers.Serializer):
                 # RelatedField can iterate over the queryset
                 ret[field_nm] = AlchemyRelatedField(source=field_nm,
                                                     many=rel_prop.uselist,
-                                                    request=self.context['request'])
+                                                    path=self.context['request'].path)
+
+        # Generate uri field for pk field
+        pk_field = primary_key(self.cls.__class__)
+        # Remove the pk from the url and pass the base path
+        ret[pk_field] = AlchemyUriField(source=pk_field,
+                                        path='/'.join(self.context['request'].path.split('/')[:-2]) + '/')
+
+        return ret
+
+
+class AlchemyListSerializer(AlchemyModelSerializer):
+    def get_default_fields(self):
+        ret = SortedDict()
+
+        # URI field for get pk field
+        pk_field = primary_key(self.cls.__class__)
+
+        ret[pk_field] = AlchemyUriField(source=pk_field,
+                                        path=self.context['request'].path)
 
         return ret
 

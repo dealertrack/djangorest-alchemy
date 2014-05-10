@@ -3,24 +3,7 @@ Base for interfacing with SQLAlchemy
 Provides the necessary plumbing for CRUD
 using SA session
 '''
-from sqlalchemy.orm import class_mapper
-
-
-def class_keys(cls):
-    """This is a utility function to get the attribute names for
-    the primary keys of a class
-
-    # >>> class_keys(Deal)
-    # >>> ('dealer_code', 'deal_jacket_id', 'deal_id')
-    """
-    reverse_map = {}
-    for name, attr in cls.__dict__.items():
-        try:
-            reverse_map[attr.property.columns[0].name] = name
-        except:
-            pass
-    mapper = class_mapper(cls)
-    return tuple(reverse_map[key.name] for key in mapper.primary_key)
+from inspector import class_keys, primary_key
 
 
 class AlchemyModelManager(object):
@@ -42,7 +25,22 @@ class AlchemyModelManager(object):
         self.cls = self.model_class
 
     def list(self, filters=None):
-        return self.session.query(self.cls).all()
+        '''
+        List returns back list of URI
+        In case of multiple pks, We guess the pk
+        by using '<modelname>_id' as the field convention
+        '''
+        pk = primary_key(self.cls)
+
+        queryset = self.session.query(self.cls.__dict__[pk]).all()
+
+        newlist = list()
+        for pk_val in queryset:
+            cls_inst = self.cls()
+            setattr(cls_inst, pk, pk_val[0])
+            newlist.append(cls_inst)
+
+        return newlist
 
     def retrieve(self, pks):
 

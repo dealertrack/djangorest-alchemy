@@ -11,7 +11,7 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship
 import datetime
 
-engine = create_engine('sqlite://', echo=True)
+engine = create_engine('sqlite://', echo=False)
 
 Base = declarative_base()
 
@@ -21,7 +21,7 @@ Session.configure(bind=engine)
 metadata = MetaData()
 
 cls_test = Table('classical_test', metadata,
-                 Column(u'id', INTEGER(), primary_key=True),
+                 Column(u'classicalmodel_id', INTEGER(), primary_key=True),
                  Column(u'field', String)
                  )
 
@@ -31,7 +31,7 @@ class ChildModel(Base):
 
     childmodel_id = Column(INTEGER, primary_key=True)
     parent_id = Column(INTEGER,
-                       ForeignKey("test_model.id"),
+                       ForeignKey("test_model.declarativemodel_id"),
                        primary_key=True,)
 
 
@@ -39,20 +39,20 @@ class ChildModel(Base):
 class DeclarativeModel(Base):
     __tablename__ = 'test_model'
 
-    id = Column(INTEGER, primary_key=True)
+    declarativemodel_id = Column(INTEGER, primary_key=True)
     field = Column(String)
     datetime = Column(DateTime, default=datetime.datetime.utcnow)
     floatfield = Column(Float)
     bigintfield = Column(BigInteger)
     child_model = relationship(ChildModel, uselist=False, primaryjoin=
-                              (id == ChildModel.parent_id))
+                              (declarativemodel_id == ChildModel.parent_id))
 
 
 #Multiple primary keys
 class CompositeKeysModel(Base):
     __tablename__ = 'composite_model'
 
-    id = Column(INTEGER, primary_key=True)
+    compositekeysmodel_id = Column(INTEGER, primary_key=True)
     pk1 = Column(String, primary_key=True)
     pk2 = Column(String, primary_key=True)
     field = Column(String)
@@ -70,7 +70,7 @@ Base.metadata.create_all(bind=engine)
 metadata.create_all(bind=engine)
 
 t = DeclarativeModel()
-t.id = 1
+t.declarativemodel_id = 1
 t.field = "test"
 t.floatfield = 1.2345
 t.bigintfield = 1234567890123456789
@@ -84,14 +84,14 @@ session.add(t)
 session.commit()
 
 c = CompositeKeysModel()
-c.id = 1
+c.compositekeysmodel_id = 1
 c.pk1 = 'ABCD'
 c.pk2 = 'WXYZ'
 session.add(c)
 session.commit()
 
 cl = ClassicalModel()
-cl.id = 1
+cl.classicalmodel_id = 1
 cl.field = 'test'
 session.add(cl)
 session.commit()
