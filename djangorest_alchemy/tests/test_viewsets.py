@@ -16,6 +16,17 @@ from rest_framework_nested import routers
 from rest_framework import status
 
 
+class PrimaryKeyMixin(object):
+
+    def get_other_pks(self, request):
+        pks = {
+            'pk1': request.META.get('PK1'),
+            'pk2': request.META.get('PK2'),
+        }
+
+        return pks
+
+
 class DeclarativeModelManager(SessionMixin, AlchemyModelManager):
     model_class = DeclarativeModel
 
@@ -30,17 +41,6 @@ class ClassicalModelManager(SessionMixin, AlchemyModelManager):
 
 class ClassicalModelViewSet(AlchemyModelViewSet):
     manager_class = ClassicalModelManager
-
-
-class PrimaryKeyMixin(object):
-
-    def get_other_pks(self, request):
-        pks = {
-            'pk1': request.META.get('PK1'),
-            'pk2': request.META.get('PK2'),
-        }
-
-        return pks
 
 
 class ModelManager(SessionMixin, AlchemyModelManager):
@@ -95,7 +95,7 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertTrue(isinstance(resp.data['bigintfield'], (int, long)))
 
     def test_classical_list(self):
-        resp = self.client.get('/api/clsmodels/?dummy=1')
+        resp = self.client.get('/api/clsmodels/?field=test')
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
@@ -108,6 +108,10 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertEqual(resp.data['classicalmodel_id'], 1)
         self.assertEqual(resp.data['field'], 'test')
 
+    #
+    # Composite key tests
+    #
+
     def test_with_multiple_pk_retrieve(self):
         resp = self.client.get('/api/compositemodels/1/',
                                PK1='ABCD', PK2='WXYZ')
@@ -119,12 +123,27 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertEqual(resp.data['pk2'], 'WXYZ')
 
     def test_hierarchical_multiple_pk_retrieve(self):
-        resp = self.client.get('/api/declmodels/1/childmodels/2/',
-                               PK1='ABCD', PK2='WXYZ')
+        resp = self.client.get('/api/declmodels/1/childmodels/2/')
         print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertEqual(resp.data['childmodel_id'], 2)
         self.assertEqual(resp.data['parent_id'], 1)
+
+    #
+    # Filter and pagination tests
+    #
+
+    def test_basic_filter(self):
+        resp = self.client.get('/api/declmodels/?field=test')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 1)
+
+    def test_invalid_filter(self):
+        resp = self.client.get('/api/declmodels/?field=invalid')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 0)
 
 
 class TestAlchemyViewSetUnit(unittest.TestCase):

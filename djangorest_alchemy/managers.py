@@ -15,7 +15,8 @@ class AlchemyModelManager(object):
         '''
         self.cls = self.model_class
 
-        super(AlchemyModelManager, self).__init__(*args, **kwargs)
+        #Throws error in tests
+        #super(AlchemyModelManager, self).__init__(*args, **kwargs)
 
         assert hasattr(self, 'session'), "session is expected"
         assert self.session is not None, "session must be initialized" \
@@ -29,10 +30,19 @@ class AlchemyModelManager(object):
         '''
         pk = primary_key(self.cls)
 
+        filter_dict = dict()
+
+        if filters:
+            filter_dict = {k:v for k, v in filters.iteritems()}
+
         if other_pks:
+            other_pks.update(filter_dict)
             queryset = self.session.query(self.cls.__dict__[pk]).filter_by(**other_pks).all()
         else:
-            queryset = self.session.query(self.cls.__dict__[pk]).all()
+            if filter_dict:
+                queryset = self.session.query(self.cls.__dict__[pk]).filter_by(**filter_dict).all()
+            else:
+                queryset = self.session.query(self.cls.__dict__[pk]).all()
 
         newlist = list()
         for pk_val in queryset:
@@ -43,15 +53,31 @@ class AlchemyModelManager(object):
         return newlist
 
     def retrieve(self, pks, other_pks=None):
-        newargs = list()
+        '''
+        Retrieve fetches the object based on the following pk logic:
+        if 'other' pks are not found, just use the pk list (coming from URLS)
+        assuming their order is already correct
+        if 'other' pks are found, then use the class keys to
+        get the correct order of pks, look them up
+        '''
 
-        for key in class_keys(self.cls):
-            if other_pks and key in other_pks:
-                newargs.append(other_pks[key])
-            else:
-                newargs.append(pks[-1])
+        if not other_pks:
+            newargs = list(pks)
+        else:
+            newargs = list()
+            pk_added = False
+            for key in class_keys(self.cls):
+                if other_pks and key in other_pks:
+                    newargs.append(other_pks[key])
+                else:
+                    if not pk_added:
+                        newargs.append(pks[-1])
+                        pk_added = True
 
-        #for pk in pks[:-2]:
+            # Confirm this logic works!!!
+            # will the order be correct if we just append?
+            for pk in pks[:-1]:
+                newargs.append(pk)
 
         return self.session.query(self.cls).get(newargs)
 

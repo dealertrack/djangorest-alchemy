@@ -43,7 +43,8 @@ class AlchemyModelViewSet(viewsets.ViewSet):
     def list(self, request):
 
         mgr = self.manager_factory(context={'request': request})
-        queryset = mgr.list(other_pks=self.get_other_pks(request))
+        queryset = mgr.list(other_pks=self.get_other_pks(request),
+                            filters=request.QUERY_PARAMS)
         serializer = AlchemyListSerializer(queryset,
                                            model_class=mgr.model_class(),
                                            context={'request': request})

@@ -11,7 +11,7 @@ from sqlalchemy.orm import mapper
 from sqlalchemy.orm import relationship
 import datetime
 
-engine = create_engine('sqlite://', echo=False)
+engine = create_engine('sqlite://', echo=True)
 
 Base = declarative_base()
 
