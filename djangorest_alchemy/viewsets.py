@@ -20,6 +20,8 @@ class AlchemyModelViewSet(viewsets.ViewSet):
         Factory method for instantiating manager class
         Override to return back your instance
         '''
+        assert hasattr(self, 'manager_class'), \
+            "manager_class has to be specified"
         return self.manager_class(*args, **kwargs)
 
     def get_other_pks(self, request):
@@ -39,22 +41,18 @@ class AlchemyModelViewSet(viewsets.ViewSet):
         return kwargs.values()
 
     def list(self, request):
-        assert hasattr(self, 'manager_class'), \
-            "manager_class has to be specified"
 
-        mgr = self.manager_factory()
-        queryset = mgr.list()
+        mgr = self.manager_factory(context={'request': request})
+        queryset = mgr.list(other_pks=self.get_other_pks(request))
         serializer = AlchemyListSerializer(queryset,
                                            model_class=mgr.model_class(),
                                            context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, **kwargs):
-        assert hasattr(self, 'manager_class'), \
-            "manager_class has to be specified"
 
-        mgr = self.manager_factory(headers=self.get_other_pks(request))
-        queryset = mgr.retrieve(self.get_pks(request, **kwargs))
+        mgr = self.manager_factory(context={'request': request})
+        queryset = mgr.retrieve(self.get_pks(request, **kwargs), other_pks=self.get_other_pks(request))
 
         serializer = AlchemyModelSerializer(queryset,
                                             model_class=mgr.model_class(),

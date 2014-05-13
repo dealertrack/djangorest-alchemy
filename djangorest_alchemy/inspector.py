@@ -38,8 +38,14 @@ def primary_key(cls):
             break
 
     if not pk in cls.__dict__:
-        raise Exception("Could not guess primary key field"
-                        "for %s. Tried to use %s as field name" (cls, pk))
+        # could not find pk field in class, now check
+        # whether it has been explicitly specified
+        if 'pk_field' in cls.__dict__:
+            pk = cls.__dict__['pk_field']
+        else:
+            raise Exception("Could not figure out primary key field"
+                            " for %s model. Tried to first use %s as field name, and then"
+                            "looked for pk_field attr which was also missing" % (cls.__name__, pk))
 
     return pk
 

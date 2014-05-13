@@ -13,8 +13,7 @@ class AlchemyModelManager(object):
         self.session is expected to be initialized
         by the derived class
         '''
-        if 'headers' in kwargs:
-            self.context = kwargs.pop('headers')
+        self.cls = self.model_class
 
         super(AlchemyModelManager, self).__init__(*args, **kwargs)
 
@@ -22,9 +21,7 @@ class AlchemyModelManager(object):
         assert self.session is not None, "session must be initialized" \
                                          "by the derived class"
 
-        self.cls = self.model_class
-
-    def list(self, filters=None):
+    def list(self, other_pks=None, filters=None):
         '''
         List returns back list of URI
         In case of multiple pks, We guess the pk
@@ -32,7 +29,10 @@ class AlchemyModelManager(object):
         '''
         pk = primary_key(self.cls)
 
-        queryset = self.session.query(self.cls.__dict__[pk]).all()
+        if other_pks:
+            queryset = self.session.query(self.cls.__dict__[pk]).filter_by(**other_pks).all()
+        else:
+            queryset = self.session.query(self.cls.__dict__[pk]).all()
 
         newlist = list()
         for pk_val in queryset:
@@ -42,12 +42,16 @@ class AlchemyModelManager(object):
 
         return newlist
 
-    def retrieve(self, pks):
+    def retrieve(self, pks, other_pks=None):
+        newargs = list()
 
-        newargs = list(pks)
         for key in class_keys(self.cls):
-            if key in self.context:
-                newargs.append(self.context[key])
+            if other_pks and key in other_pks:
+                newargs.append(other_pks[key])
+            else:
+                newargs.append(pks[-1])
+
+        #for pk in pks[:-2]:
 
         return self.session.query(self.cls).get(newargs)
 
