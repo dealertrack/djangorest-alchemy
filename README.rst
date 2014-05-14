@@ -4,7 +4,7 @@ djangorest-alchemy
 
 .. image:: https://badge.fury.io/py/djangorest-alchemy.png
     :target: http://badge.fury.io/py/djangorest-alchemy
-    
+
 .. image:: https://travis-ci.org/iagore/djangorest-alchemy.png?branch=master
         :target: https://travis-ci.org/iagore/djangorest-alchemy
 
@@ -14,8 +14,8 @@ djangorest-alchemy
 
 Django REST Framework and SQLAlchemy integration
 
-* Free software: BSD license
-* Documentation: http://djangorest-alchemy.rtfd.org.
+* Free software: MIT license
+* Documentation: <TBD>
 
 Features
 --------
