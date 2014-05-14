@@ -48,9 +48,9 @@ def primary_key(cls):
             pk = cls.__dict__['pk_field']
         else:
             raise KeyNotFoundException("Could not figure out primary key field"
-                                       "for %s model. Tried to first use %s as field name, and then"
-                                       " looked for pk_field attr which was also missing" % (cls.__name__, pk))
+                                       "for %s model. Tried to first use %s as"
+                                       " field name,and then looked for"
+                                       " pk_field attr which was also missing"
+                                       % (cls.__name__, pk))
 
     return pk
-
-

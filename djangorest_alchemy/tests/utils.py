@@ -52,9 +52,10 @@ class DeclarativeModel(Base):
 class CompositeKeysModel(Base):
     __tablename__ = 'composite_model'
 
-    compositekeysmodel_id = Column(INTEGER, primary_key=True)
+    #This order of PK definition is important
     pk1 = Column(String, primary_key=True)
     pk2 = Column(String, primary_key=True)
+    compositekeysmodel_id = Column(INTEGER, primary_key=True)
     field = Column(String)
 
 
@@ -105,5 +106,3 @@ class SessionMixin(object):
         # because in case of multiple inheritance
         # this calls the next __init__ in the MRO
         super(SessionMixin, self).__init__(*args, **kwargs)
-
-

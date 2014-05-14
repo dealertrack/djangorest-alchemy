@@ -59,15 +59,18 @@ class ChildModelViewSet(AlchemyModelViewSet):
     manager_class = ChildModelManager
 
 viewset_router = routers.SimpleRouter()
-viewset_router.register(r'api/declmodels', DeclModelViewSet, base_name='test-decl')
+viewset_router.register(r'api/declmodels', DeclModelViewSet,
+                        base_name='test-decl')
 viewset_router.register(r'api/clsmodels', ClassicalModelViewSet,
                         base_name='test-cls')
 viewset_router.register(r'api/compositemodels', ModelViewSet,
                         base_name='test-composite')
 
 # Register the child model
-child_router = routers.NestedSimpleRouter(viewset_router, r'api/declmodels', lookup='declmodels')
-child_router.register("childmodels", ChildModelViewSet, base_name='test-childmodel')
+child_router = routers.NestedSimpleRouter(viewset_router, r'api/declmodels',
+                                          lookup='declmodels')
+child_router.register("childmodels", ChildModelViewSet,
+                      base_name='test-childmodel')
 
 urlpatterns = patterns('',
                        url(r'^', include(viewset_router.urls)),

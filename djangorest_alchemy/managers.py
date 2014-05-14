@@ -37,14 +37,16 @@ class AlchemyModelManager(object):
         filter_dict = dict()
 
         if filters:
-            filter_dict = {k:v for k, v in filters.iteritems()}
+            filter_dict = {k: v for k, v in filters.iteritems()}
 
         if other_pks:
             other_pks.update(filter_dict)
-            queryset = self.session.query(self.cls.__dict__[pk]).filter_by(**other_pks).all()
+            queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
+                **other_pks).all()
         else:
             if filter_dict:
-                queryset = self.session.query(self.cls.__dict__[pk]).filter_by(**filter_dict).all()
+                queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
+                    **filter_dict).all()
             else:
                 queryset = self.session.query(self.cls.__dict__[pk]).all()
 
@@ -64,23 +66,24 @@ class AlchemyModelManager(object):
         get the correct order of pks, look them up
         '''
 
+        print pks
+
         if not other_pks:
             newargs = list(pks)
         else:
             newargs = list()
-            pk_added = False
+            #pk_added = False
             for key in class_keys(self.cls):
                 if other_pks and key in other_pks:
                     newargs.append(other_pks[key])
-                else:
-                    if not pk_added:
-                        newargs.append(pks[-1])
-                        pk_added = True
+                #else:
+                #    if not pk_added:
+                #        newargs.append(pks[-1])
+                #        pk_added = True
 
             # Confirm this logic works!!!
             # will the order be correct if we just append?
-            for pk in pks[:-1]:
+            for pk in reversed(pks):
                 newargs.append(pk)
 
         return self.session.query(self.cls).get(newargs)
-

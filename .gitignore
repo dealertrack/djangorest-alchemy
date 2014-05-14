@@ -26,6 +26,7 @@ pip-log.txt
 .tox
 nosetests.xml
 htmlcov
+flake8.out
 
 # Translations
 *.mo

@@ -65,12 +65,13 @@ class AlchemyModelSerializer(serializers.Serializer):
         for rel_prop in mapper.iterate_properties:
             if isinstance(rel_prop, RelationshipProperty):
                 field_nm = str(rel_prop).split('.')[1]
-                request = self.context['request']
+                r = self.context['request']
                 # many becomes same as uselist so that
                 # RelatedField can iterate over the queryset
                 ret[field_nm] = AlchemyRelatedField(source=field_nm,
                                                     many=rel_prop.uselist,
-                                                    path=request.build_absolute_uri(request.path))
+                                                    path=r.build_absolute_uri(
+                                                        r.path))
 
         # Below can be conditional based on a flag
         # if we want to use URI instead of actual id
@@ -79,7 +80,8 @@ class AlchemyModelSerializer(serializers.Serializer):
         #pk_field = primary_key(self.cls.__class__)
         # Remove the pk from the url and pass the base path
         #ret[pk_field] = AlchemyUriField(source=pk_field,
-        #                                path='/'.join(self.context['request'].path.split('/')[:-2]) + '/')
+        #                                path='/'.join(
+        #self.context['request'].path.split('/')[:-2]) + '/')
 
         return ret
 
@@ -96,9 +98,7 @@ class AlchemyListSerializer(AlchemyModelSerializer):
 
         request = self.context['request']
         ret[pk_field] = AlchemyUriField(source=pk_field,
-                                        path=request.build_absolute_uri(request.path))
+                                        path=request.build_absolute_uri(
+                                            request.path))
 
         return ret
-
-
-

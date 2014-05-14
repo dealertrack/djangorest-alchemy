@@ -25,16 +25,16 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 djangorest-alchemy tests
+	flake8 --ignore=F403 djangorest_alchemy > flake8.out
 
 test:
-	python setup.py test
+	 DJANGO_SETTINGS_MODULE=djangorest_alchemy.settings nosetests
 
 test-all:
 	tox
 
 coverage:
-	coverage run --source djangorest-alchemy setup.py test
+	coverage run --source djangorest_alchemy
 	coverage report -m
 	coverage html
 	open htmlcov/index.html
@@ -55,3 +55,5 @@ dist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
 	ls -l dist
+
+build: clean test lint
