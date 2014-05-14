@@ -4,6 +4,10 @@ Functions to reflect over SQLAlchemy models
 from sqlalchemy.orm import class_mapper
 
 
+class KeyNotFoundException(Exception):
+    """Primary key not found exception"""
+
+
 def class_keys(cls):
     """This is a utility function to get the attribute names for
     the primary keys of a class
@@ -43,9 +47,9 @@ def primary_key(cls):
         if 'pk_field' in cls.__dict__:
             pk = cls.__dict__['pk_field']
         else:
-            raise Exception("Could not figure out primary key field"
-                            " for %s model. Tried to first use %s as field name, and then"
-                            "looked for pk_field attr which was also missing" % (cls.__name__, pk))
+            raise KeyNotFoundException("Could not figure out primary key field"
+                                       "for %s model. Tried to first use %s as field name, and then"
+                                       " looked for pk_field attr which was also missing" % (cls.__name__, pk))
 
     return pk
 

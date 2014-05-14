@@ -3,7 +3,7 @@ Base for interfacing with SQLAlchemy
 Provides the necessary plumbing for CRUD
 using SA session
 '''
-from inspector import class_keys, primary_key
+from inspector import class_keys, primary_key, KeyNotFoundException
 
 
 class AlchemyModelManager(object):
@@ -28,7 +28,11 @@ class AlchemyModelManager(object):
         In case of multiple pks, We guess the pk
         by using '<modelname>_id' as the field convention
         '''
-        pk = primary_key(self.cls)
+        newlist = list()
+        try:
+            pk = primary_key(self.cls)
+        except KeyNotFoundException:
+            return newlist
 
         filter_dict = dict()
 
@@ -44,7 +48,6 @@ class AlchemyModelManager(object):
             else:
                 queryset = self.session.query(self.cls.__dict__[pk]).all()
 
-        newlist = list()
         for pk_val in queryset:
             cls_inst = self.cls()
             setattr(cls_inst, pk, pk_val[0])

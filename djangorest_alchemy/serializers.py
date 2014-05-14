@@ -12,7 +12,7 @@ from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
 #from sqlalchemy import inspect
 from sqlalchemy.orm import class_mapper
-from inspector import primary_key
+from inspector import primary_key, KeyNotFoundException
 from sqlalchemy.orm.properties import RelationshipProperty, ColumnProperty
 
 
@@ -88,8 +88,11 @@ class AlchemyListSerializer(AlchemyModelSerializer):
     def get_default_fields(self):
         ret = SortedDict()
 
-        # URI field for get pk field
-        pk_field = primary_key(self.cls.__class__)
+        try:
+            # URI field for get pk field
+            pk_field = primary_key(self.cls.__class__)
+        except KeyNotFoundException:
+            return ret
 
         request = self.context['request']
         ret[pk_field] = AlchemyUriField(source=pk_field,

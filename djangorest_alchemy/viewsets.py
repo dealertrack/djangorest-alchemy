@@ -40,9 +40,10 @@ class AlchemyModelViewSet(viewsets.ViewSet):
         '''
         return kwargs.values()
 
-    def list(self, request):
+    def list(self, request, **kwargs):
 
         mgr = self.manager_factory(context={'request': request})
+
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
         serializer = AlchemyListSerializer(queryset,
@@ -53,6 +54,7 @@ class AlchemyModelViewSet(viewsets.ViewSet):
     def retrieve(self, request, **kwargs):
 
         mgr = self.manager_factory(context={'request': request})
+
         queryset = mgr.retrieve(self.get_pks(request, **kwargs), other_pks=self.get_other_pks(request))
 
         serializer = AlchemyModelSerializer(queryset,
