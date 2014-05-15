@@ -25,7 +25,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 --ignore=F403 djangorest_alchemy > flake8.out
+	flake8 djangorest_alchemy > flake8.out
 
 test:
 	 DJANGO_SETTINGS_MODULE=djangorest_alchemy.settings nosetests
