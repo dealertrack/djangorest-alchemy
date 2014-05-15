@@ -3,13 +3,11 @@ Base AlchemyModelSerializer which provides the mapping between
 SQLALchemy and DRF fields to serialize/deserialize objects
 '''
 from rest_framework import serializers
-#from rest_framework.relations import *
 from rest_framework.fields import (CharField, IntegerField, DateTimeField,
                                    FloatField, BooleanField)
 from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
                               CHAR, TIMESTAMP, DATE, Float, BigInteger,
                               Numeric, DateTime, Boolean)
-#from sqlalchemy import *
 from django.utils.datastructures import SortedDict
 from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
@@ -47,12 +45,6 @@ class AlchemyModelSerializer(serializers.Serializer):
         self.cls = kwargs.pop('model_class')
         super(AlchemyModelSerializer, self).__init__(*args, **kwargs)
 
-    #def to_native(self, obj):
-    #    native = super(AlchemyModelSerializer, self).to_native(obj)
-    #    import pdb
-    #    pdb.set_trace()
-    #    return native
-
     def get_default_fields(self):
 
         ret = SortedDict()
@@ -81,23 +73,6 @@ class AlchemyModelSerializer(serializers.Serializer):
                                                     many=rel_prop.uselist,
                                                     path=r.build_absolute_uri(
                                                         r.path))
-
-        # Get all the property fields
-        #for prop, value in self.cls.__dict__.iteritems():
-        #    import pdb
-        #    pdb.set_trace()
-        #    if isinstance(value, property):
-        #        ret[prop] = self.field_mapping[value.type.__class__]
-
-        # Below can be conditional based on a flag
-        # if we want to use URI instead of actual id
-
-        # Generate uri field for pk field
-        #pk_field = primary_key(self.cls.__class__)
-        # Remove the pk from the url and pass the base path
-        #ret[pk_field] = AlchemyUriField(source=pk_field,
-        #                                path='/'.join(
-        #self.context['request'].path.split('/')[:-2]) + '/')
 
         return ret
 
