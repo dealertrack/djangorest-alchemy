@@ -105,7 +105,7 @@ dictionary of primary keys. Example::
 
 Filters work exactly like Django REST Framework. Pass the field value pair in querystring.
 
-Example http://server/api/models/?field=value
+```curl -v  http://server/api/declmodels/?field=value```
 
 
 **Manager factory**
@@ -144,3 +144,5 @@ Example::
         # Delegate to manager method
         mgr.do_something(request.DATA, pk=pk, **kwargs)
         return Response({'status': 'did_something'}, status=status.HTTP_200_OK)
+
+```curl -X POST http://server/api/declmodels/1/do_something/```
