@@ -75,7 +75,7 @@ Advanced Usage
 --------------
 
 
-Multiple primary keys
+**Multiple primary keys**
 
 
 To use some sort of identifier in the URI, the library tries to use the following
@@ -101,12 +101,14 @@ dictionary of primary keys. Example::
             return pks
 
 
+**Filters**
+
 Filters work exactly like Django REST Framework. Pass the field value pair in querystring.
 
 Example http://server/api/models/?field=value
 
 
-Manager factory
+**Manager factory**
 
 
 The base AlchemyModelViewSet viewset provides a way to override the instantiation
@@ -117,7 +119,7 @@ of the manager. Example::
             return ModelManager()
 
 
-Nested Models
+**Nested Models**
 
 
 This library recommends using the drf-nested-routers for implementing nested child
@@ -127,3 +129,18 @@ models. Example::
                                           lookup='declmodels')
 
 For more details, refer to the drf-nested-routers documentation.
+
+
+**Custom methods**
+
+DRF allows to add custom methods other than the default list, retrieve, create, update and destroy
+
+
+Example::
+
+    @action(methods=['POST'])
+    def do_something(self, request, pk=None, **kwargs):
+        mgr = self.manager_factory()
+        # Delegate to manager method
+        mgr.do_something(request.DATA, pk=pk, **kwargs)
+        return Response({'status': 'did_something'}, status=status.HTTP_200_OK)
