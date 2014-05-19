@@ -75,9 +75,7 @@ Finally, register the routers as you would normally do using Django REST::
 Advanced Usage
 --------------
 
-
 Multiple primary keys
-~~~~~~~~~~~~
 
 To use some sort of identifier in the URI, the library tries to use the following
 logic.
@@ -101,8 +99,6 @@ dictionary of primary keys. Example::
             }
             return pks
 
-Filters
-~~~~~~~
 
 Filters work exactly like Django REST Framework. Pass the field value pair in querystring.
 
@@ -110,7 +106,7 @@ Example http://server/api/models/?field=value
 
 
 Manager factory
-~~~~~~~~~~~~~~~
+
 
 The base AlchemyModelViewSet viewset provides a way to override the instantiation
 of the manager. Example::
@@ -121,7 +117,7 @@ of the manager. Example::
 
 
 Nested Models
-~~~~~~~~~~~~~
+
 
 This library recommends using the drf-nested-routers for implementing nested child
 models. Example::
