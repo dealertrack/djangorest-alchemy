@@ -77,7 +77,7 @@ Advanced Usage
 For advanced usage.
 
 Multiple primary keys
-~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 To use some sort of identifier in the URI, the library tries to use the following
 logic.
