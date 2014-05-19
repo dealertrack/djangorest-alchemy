@@ -74,10 +74,9 @@ Finally, register the routers as you would normally do using Django REST::
 Advanced Usage
 --------------
 
-For advanced usage.
 
 Multiple primary keys
-~~~~~~~~~~~~~~~~~~~~~
+#######
 
 To use some sort of identifier in the URI, the library tries to use the following
 logic.
