@@ -55,10 +55,8 @@ Define the 'manager' class to work on above model::
         model_class = DeclarativeModel
 
 
-Note::
-
-    SessionMixin just provides a convenient way to initialize the SQLAlchemy session. You
-    can achieve the same by definining __init__ and setting ```self.session``` instance
+SessionMixin just provides a convenient way to initialize the SQLAlchemy session. You
+can achieve the same by definining __init__ and setting ```self.session``` instance
 
 
 Define the Django REST viewset and specify the manager class::
@@ -77,8 +75,9 @@ Finally, register the routers as you would normally do using Django REST::
 Advanced Usage
 --------------
 
+
 Multiple primary keys
-~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 To use some sort of identifier in the URI, the library tries to use the following
 logic.
@@ -93,16 +92,13 @@ In addition, to support multiple primary keys which cannot be accomodated in the
 the viewset needs to override the ```get_other_pks``` method and return back
 dictionary of primary keys. Example::
 
-
     class ModelViewSet(AlchemyModelViewSet):
         manager_class = ModelManager
-
         def get_other_pks(self, request):
             pks = {
                 'pk1': request.META.get('PK1'),
                 'pk2': request.META.get('PK2'),
             }
-
             return pks
 
 Filters
@@ -118,7 +114,6 @@ Manager factory
 
 The base AlchemyModelViewSet viewset provides a way to override the instantiation
 of the manager. Example::
-
 
     class ModelViewSet(AlchemyModelViewSet):
         def manager_factory(self, *args, **kwargs):
