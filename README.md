@@ -82,7 +82,7 @@ To use some sort of identifier in the URI, the library tries to use the followin
 logic.
 
 1. If a single primary key is found, use it! That was simple..
-2. For multiple keys, try to find a field with convention '<model>_id'
+2. For multiple keys, try to find a field with convention 'model_id'
 3. If not found, see if the model has 'pk_field' class variable
 4. If not found, raise KeyNotFoundException
 
