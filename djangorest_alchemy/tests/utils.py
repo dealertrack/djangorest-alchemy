@@ -3,8 +3,8 @@ Model and manager test dummies
 '''
 
 from sqlalchemy import create_engine
-from sqlalchemy import *
-from sqlalchemy.types import *
+from sqlalchemy import MetaData, Table, Column, ForeignKey
+from sqlalchemy.types import INTEGER, String, DateTime, Float, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import mapper

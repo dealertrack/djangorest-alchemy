@@ -1,7 +1,7 @@
 '''
 Relationship field
 '''
-from rest_framework.relations import *
+from rest_framework.relations import RelatedField
 from djangorest_alchemy.inspector import primary_key, KeyNotFoundException
 
 
