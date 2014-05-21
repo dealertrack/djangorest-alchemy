@@ -37,9 +37,17 @@ class AlchemyModelManager(object):
             filter_dict.pop('format', None)
 
         if other_pks:
-            other_pks.update(filter_dict)
+            query_pks = dict()
+
+            # Use only those keys which are primary keys
+            # and pick them up from the passed dict
+            for key in class_keys(self.cls):
+                if key in other_pks:
+                    query_pks[key] = other_pks[key]
+
+            query_pks.update(filter_dict)
             queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
-                **other_pks).all()
+                **query_pks).all()
         else:
             if filter_dict:
                 queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
