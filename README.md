@@ -151,7 +151,7 @@ Example::
 Examples
 --------
 
-The examples folder demonstrates a real-worl example using Cars and Parts as the object models.
+The examples folder demonstrates a real-world example using Cars and Parts as the object models.
 
 Run the following command just as you would normally run a Django project:
 
