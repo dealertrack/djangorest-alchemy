@@ -19,11 +19,18 @@ Session.configure(bind=engine)
 metadata = MetaData()
 
 
+# Model name should follow the convention
+# such that URI name becomes <model>s e.g. parts
 class Part(Base):
     __tablename__ = 'parts'
 
-    car_id = Column(INTEGER, ForeignKey("cars.car_id"), primary_key=True)
+    # Below is optional if order and convention of
+    # PK is followed
+    # pk_field = 'part_id'
+
+    # PK order is important in case of multiple PKs
     part_id = Column(INTEGER, primary_key=True)
+    car_id = Column(INTEGER, ForeignKey("cars.car_id"), primary_key=True)
     part_description = Column(String)
     part_num = Column(INTEGER)
 
@@ -44,7 +51,7 @@ Base.metadata.create_all(bind=engine)
 metadata.create_all(bind=engine)
 
 car = Car(car_id='1', make='Toyota', model='Prius', year='2014')
-part = Part(car_id='1', part_id='1', part_description='Engine', part_num='100')
+part = Part(car_id='1', part_id='2', part_description='Engine', part_num='100')
 
 session = Session()
 session.add(car)

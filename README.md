@@ -146,3 +146,22 @@ Example::
         return Response({'status': 'did_something'}, status=status.HTTP_200_OK)
 
 ```curl -X POST http://server/api/declmodels/1/do_something/```
+
+
+Examples
+--------
+
+The examples folder demonstrates a real-worl example using Cars and Parts as the object models.
+
+Run the following command just as you would normally run a Django project:
+
+```
+cd examples
+python manage.py runserver --settings=settings
+```
+
+Then type the following in your favorite browser:
+
+```
+http://localhost/api/cars/
+```
