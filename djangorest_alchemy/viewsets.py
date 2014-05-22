@@ -5,11 +5,15 @@ AlchemyModelSerializer and AlchemyModelManager
 '''
 from rest_framework import viewsets
 from rest_framework.response import Response
+from rest_framework import status
 from djangorest_alchemy.serializers import AlchemyModelSerializer
 from djangorest_alchemy.serializers import AlchemyListSerializer
+from djangorest_alchemy.mixins import MultipleObjectMixin
+
+from django.core.paginator import InvalidPage
 
 
-class AlchemyModelViewSet(viewsets.ViewSet):
+class AlchemyModelViewSet(MultipleObjectMixin, viewsets.ViewSet):
     """
     Generic SQLAlchemy viewset which calls
     methods over the specified manager_class and
@@ -70,6 +74,13 @@ class AlchemyModelViewSet(viewsets.ViewSet):
 
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
+
+        if self.paginate_by:
+            try:
+                queryset = self.get_page(queryset)
+            except InvalidPage:
+                return Response({}, status.HTTP_400_BAD_REQUEST)
+
         serializer = AlchemyListSerializer(queryset,
                                            model_class=mgr.model_class(),
                                            context={'request': request})
