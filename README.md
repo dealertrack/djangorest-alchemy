@@ -117,9 +117,9 @@ has the ```paginate_by``` field set, pass page number in querystring::
             paginate_by = 25
 
 
-Get 5th page ```curl -v  http://server/api/declmodels/?page=5```
-Get last page ```curl -v  http://server/api/declmodels/?page=last```
-Not specifying any page returns first page ```curl -v  http://server/api/declmodels/```
+* 5th page ```curl -v  http://server/api/declmodels/?page=5```
+* Last page ```curl -v  http://server/api/declmodels/?page=last```
+* First page ```curl -v  http://server/api/declmodels/```
 
 
 **Manager factory**
