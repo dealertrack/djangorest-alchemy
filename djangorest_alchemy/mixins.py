@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
-import re
 
 from django.core.paginator import Paginator, InvalidPage, Page
-
-
-def camelcase_to_underscore(str):
-    """Convert CamelCase class names to lowercase_with_underscores.
-
-    This is arcane magic.
-    """
-    return re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1',
-                  str).lower().strip('_')
 
 
 class MultipleObjectMixin(object):
@@ -18,8 +8,6 @@ class MultipleObjectMixin(object):
     allow_empty = True
     query_object = None
     paginate_by = None
-    sort_by = None
-    context_object_name = None
     paginator_class = Paginator
 
     def filter_query_object(self, query_object):
