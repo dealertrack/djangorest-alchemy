@@ -32,6 +32,8 @@ make test
 Usage
 ------
 
+**Getting Started**
+
 Assuming you have a SQLAlchemy model defined as below::
 
 
@@ -54,8 +56,8 @@ Define the 'manager' class to work on above model::
         model_class = DeclarativeModel
 
 
-SessionMixin just provides a convenient way to initialize the SQLAlchemy session. You
-can achieve the same by definining __init__ and setting ```self.session``` instance
+*SessionMixin just provides a convenient way to initialize the SQLAlchemy session. You
+can achieve the same by definining __init__ and setting ```self.session``` instance*
 
 
 Define the Django REST viewset and specify the manager class::
@@ -69,6 +71,27 @@ Finally, register the routers as you would normally do using Django REST::
     viewset_router = routers.SimpleRouter()
     viewset_router.register(r'api/declmodels', DeclModelViewSet,
                             base_name='test-decl')
+
+
+**Pagination**
+
+Pagination works exactly like Django REST Framework (and Django). Provided your viewset
+has the ```paginate_by``` field set, pass page number in querystring::
+
+        class ModelViewSet(AlchemyModelViewSet):
+            paginate_by = 25
+
+
+* 5th page ```curl -v  http://server/api/declmodels/?page=5```
+* Last page ```curl -v  http://server/api/declmodels/?page=last```
+* First page ```curl -v  http://server/api/declmodels/```
+
+
+**Filters**
+
+Filters work exactly like Django REST Framework. Pass the field value pair in querystring.
+
+```curl -v  http://server/api/declmodels/?field=value```
 
 
 Advanced Usage
@@ -100,26 +123,6 @@ dictionary of primary keys. Example::
             }
             return pks
 
-
-**Filters**
-
-Filters work exactly like Django REST Framework. Pass the field value pair in querystring.
-
-```curl -v  http://server/api/declmodels/?field=value```
-
-
-**Pagination**
-
-Pagination works exactly like Django REST Framework (and Django). Provided your viewset
-has the ```paginate_by``` field set, pass page number in querystring::
-
-        class ModelViewSet(AlchemyModelViewSet):
-            paginate_by = 25
-
-
-* 5th page ```curl -v  http://server/api/declmodels/?page=5```
-* Last page ```curl -v  http://server/api/declmodels/?page=last```
-* First page ```curl -v  http://server/api/declmodels/```
 
 
 **Manager factory**
