@@ -108,6 +108,20 @@ Filters work exactly like Django REST Framework. Pass the field value pair in qu
 ```curl -v  http://server/api/declmodels/?field=value```
 
 
+**Pagination**
+
+Pagination works exactly like Django REST Framework (and Django). Provided your viewset
+has the ```paginate_by``` field set, pass page number in querystring::
+
+        class ModelViewSet(AlchemyModelViewSet):
+            paginate_by = 25
+
+
+Get 5th page ```curl -v  http://server/api/declmodels/?page=5```
+Get last page ```curl -v  http://server/api/declmodels/?page=last```
+Not specifying any page returns first page ```curl -v  http://server/api/declmodels/```
+
+
 **Manager factory**
 
 
