@@ -10,7 +10,15 @@ class CarManager(SessionMixin, AlchemyModelManager):
 
 
 class CarViewSet(AlchemyModelViewSet):
+    '''
+    /api/cars/?page=<num>
+    /api/cars/?page=last
+    /api/cars/?make=Toyota
+
+    You can combine both filtering and pagination
+    '''
     manager_class = CarManager
+    paginate_by = 10
 
 
 class PartManager(SessionMixin, AlchemyModelManager):

@@ -35,6 +35,8 @@ class AlchemyModelManager(object):
         if filters:
             filter_dict = {k: v for k, v in filters.iteritems()}
             filter_dict.pop('format', None)
+            filter_dict.pop('page', None)
+            filter_dict.pop('sort_by', None)
 
         if other_pks:
             query_pks = dict()
