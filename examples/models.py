@@ -1,6 +1,7 @@
 '''
 Models
 '''
+import random
 
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData, Column, ForeignKey
@@ -50,12 +51,14 @@ Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 metadata.create_all(bind=engine)
 
-car = Car(car_id='1', make='Toyota', model='Prius', year='2014')
-part = Part(car_id='1', part_id='2', part_description='Engine', part_num='100')
-
 session = Session()
-session.add(car)
-session.add(part)
+
+for i in range(0, 50):
+    car = Car(car_id=i, make='Toyota', model='Prius', year='2014')
+    part = Part(car_id=i, part_id=i + 1, part_description='Engine', part_num=random.randint(0, 1000))
+    session.add(car)
+    session.add(part)
+
 session.commit()
 
 
