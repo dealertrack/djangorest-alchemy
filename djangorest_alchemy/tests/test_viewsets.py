@@ -39,6 +39,7 @@ class DeclarativeModelManager(SessionMixin, AlchemyModelManager):
 
 class DeclModelViewSet(AlchemyModelViewSet):
     manager_class = DeclarativeModelManager
+    paginate_by = 25
 
     @action(methods=['POST'])
     def do_something(self, request, pk=None, **kwargs):
@@ -160,6 +161,21 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
         self.assertTrue(len(resp.data) == 0)
+
+    def test_basic_pagination(self):
+        resp = self.client.get('/api/declmodels/?page=1')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 1)
+
+        resp = self.client.get('/api/declmodels/?page=last')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 1)
+
+    def test_invalid_pagination(self):
+        resp = self.client.get('/api/declmodels/?page=foo')
+        self.assertTrue(resp.status_code is status.HTTP_400_BAD_REQUEST)
 
     #
     # Action methods
