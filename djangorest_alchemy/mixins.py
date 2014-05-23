@@ -32,8 +32,8 @@ class MultipleObjectMixin(object):
                 raise InvalidPage("Page is not 'last', "
                                   "nor can it be converted to an int.")
 
-        #DB2 fix for invalid 0 literal.
-        #Generates FETCH 0 rows if not done this way
+        # DB2 fix for invalid 0 literal.
+        # Generates FETCH 0 rows if not done this way
         if not paginator.count == 0:
             page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
