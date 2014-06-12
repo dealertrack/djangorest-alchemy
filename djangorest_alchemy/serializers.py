@@ -3,10 +3,13 @@ Base AlchemyModelSerializer which provides the mapping between
 SQLALchemy and DRF fields to serialize/deserialize objects
 '''
 from rest_framework import serializers
-from rest_framework.relations import *
-from rest_framework.fields import *
-from sqlalchemy.types import *
-from sqlalchemy import *
+#from rest_framework.relations import *
+from rest_framework.fields import (CharField, IntegerField, DateTimeField,
+                                   FloatField, BooleanField)
+from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
+                              CHAR, TIMESTAMP, DATE, Float, BigInteger,
+                              Numeric, DateTime, Boolean)
+#from sqlalchemy import *
 from django.utils.datastructures import SortedDict
 from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
@@ -72,6 +75,13 @@ class AlchemyModelSerializer(serializers.Serializer):
                                                     many=rel_prop.uselist,
                                                     path=r.build_absolute_uri(
                                                         r.path))
+
+        # Get all the property fields
+        for prop, value in self.cls.__dict__.iteritems():
+            if isinstance(value, property):
+                import pdb
+                pdb.set_trace()
+                ret[prop] = self.field_mapping[value.type.__class__]
 
         # Below can be conditional based on a flag
         # if we want to use URI instead of actual id

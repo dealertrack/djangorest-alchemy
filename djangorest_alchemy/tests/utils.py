@@ -47,6 +47,10 @@ class DeclarativeModel(Base):
     child_model = relationship(ChildModel, uselist=False, primaryjoin=
                               (declarativemodel_id == ChildModel.parent_id))
 
+    @property
+    def prop_field(self):
+        return self.field.upper()
+
 
 #Multiple primary keys
 class CompositeKeysModel(Base):
