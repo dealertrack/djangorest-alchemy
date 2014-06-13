@@ -14,6 +14,8 @@ import unittest
 
 from rest_framework_nested import routers
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 
 class PrimaryKeyMixin(object):
@@ -30,9 +32,21 @@ class PrimaryKeyMixin(object):
 class DeclarativeModelManager(SessionMixin, AlchemyModelManager):
     model_class = DeclarativeModel
 
+    def do_something(self, data, pk=None, **kwargs):
+        print "DO SOMETHING"
+        print data, pk
+
 
 class DeclModelViewSet(AlchemyModelViewSet):
     manager_class = DeclarativeModelManager
+    paginate_by = 25
+
+    @action(methods=['POST'])
+    def do_something(self, request, pk=None, **kwargs):
+        mgr = self.manager_factory()
+        # Delegate to manager method
+        mgr.do_something(request.DATA, pk=pk, **kwargs)
+        return Response({'status': 'did_something'}, status=status.HTTP_200_OK)
 
 
 class ClassicalModelManager(SessionMixin, AlchemyModelManager):
@@ -147,6 +161,29 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is list)
         self.assertTrue(len(resp.data) == 0)
+
+    def test_basic_pagination(self):
+        resp = self.client.get('/api/declmodels/?page=1')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 1)
+
+        resp = self.client.get('/api/declmodels/?page=last')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
+        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(len(resp.data) == 1)
+
+    def test_invalid_pagination(self):
+        resp = self.client.get('/api/declmodels/?page=foo')
+        self.assertTrue(resp.status_code is status.HTTP_400_BAD_REQUEST)
+
+    #
+    # Action methods
+    #
+
+    def test_action_method(self):
+        resp = self.client.post('/api/declmodels/1/do_something/')
+        self.assertTrue(resp.status_code is status.HTTP_200_OK)
 
 
 class TestAlchemyViewSetUnit(unittest.TestCase):

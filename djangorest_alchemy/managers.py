@@ -15,9 +15,6 @@ class AlchemyModelManager(object):
         '''
         self.cls = self.model_class
 
-        #Throws error in tests
-        #super(AlchemyModelManager, self).__init__(*args, **kwargs)
-
         assert hasattr(self, 'session'), "session is expected"
         assert self.session is not None, "session must be initialized" \
                                          "by the derived class"
@@ -28,21 +25,31 @@ class AlchemyModelManager(object):
         In case of multiple pks, We guess the pk
         by using '<modelname>_id' as the field convention
         '''
-        newlist = list()
         try:
             pk = primary_key(self.cls)
         except KeyNotFoundException:
-            return newlist
+            return list()
 
         filter_dict = dict()
 
         if filters:
             filter_dict = {k: v for k, v in filters.iteritems()}
+            filter_dict.pop('format', None)
+            filter_dict.pop('page', None)
+            filter_dict.pop('sort_by', None)
 
         if other_pks:
-            other_pks.update(filter_dict)
+            query_pks = dict()
+
+            # Use only those keys which are primary keys
+            # and pick them up from the passed dict
+            for key in class_keys(self.cls):
+                if key in other_pks:
+                    query_pks[key] = other_pks[key]
+
+            query_pks.update(filter_dict)
             queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
-                **other_pks).all()
+                **query_pks).all()
         else:
             if filter_dict:
                 queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
@@ -50,12 +57,7 @@ class AlchemyModelManager(object):
             else:
                 queryset = self.session.query(self.cls.__dict__[pk]).all()
 
-        for pk_val in queryset:
-            cls_inst = self.cls()
-            setattr(cls_inst, pk, pk_val[0])
-            newlist.append(cls_inst)
-
-        return newlist
+        return queryset
 
     def retrieve(self, pks, other_pks=None):
         '''
@@ -66,20 +68,13 @@ class AlchemyModelManager(object):
         get the correct order of pks, look them up
         '''
 
-        print pks
-
         if not other_pks:
             newargs = list(pks)
         else:
             newargs = list()
-            #pk_added = False
             for key in class_keys(self.cls):
                 if other_pks and key in other_pks:
                     newargs.append(other_pks[key])
-                #else:
-                #    if not pk_added:
-                #        newargs.append(pks[-1])
-                #        pk_added = True
 
             # Confirm this logic works!!!
             # will the order be correct if we just append?

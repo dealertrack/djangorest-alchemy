@@ -74,16 +74,6 @@ class AlchemyModelSerializer(serializers.Serializer):
                                                     path=r.build_absolute_uri(
                                                         r.path))
 
-        # Below can be conditional based on a flag
-        # if we want to use URI instead of actual id
-
-        # Generate uri field for pk field
-        #pk_field = primary_key(self.cls.__class__)
-        # Remove the pk from the url and pass the base path
-        #ret[pk_field] = AlchemyUriField(source=pk_field,
-        #                                path='/'.join(
-        #self.context['request'].path.split('/')[:-2]) + '/')
-
         return ret
 
 
