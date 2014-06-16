@@ -29,6 +29,20 @@ class AlchemyModelViewSet(MultipleObjectMixin, viewsets.ViewSet):
             "manager_class has to be specified"
         return self.manager_class(*args, **kwargs)
 
+    def serializer_factory(self, multiple, queryset, model_class, context):
+        '''
+        Factory method to instantiate appropriate serializer class
+        Override to return back your instance
+        '''
+        if multiple:
+            return AlchemyListSerializer(queryset,
+                                         model_class=model_class,
+                                         context=context)
+        else:
+            return AlchemyModelSerializer(queryset,
+                                          model_class=model_class,
+                                          context=context)
+
     def get_other_pks(self, request):
         '''
         Return default empty {}
@@ -75,15 +89,16 @@ class AlchemyModelViewSet(MultipleObjectMixin, viewsets.ViewSet):
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
 
+        serializer = self.serializer_factory(True, queryset,
+                                             mgr.model_class(),
+                                             {'request': request})
+
         if self.paginate_by:
             try:
                 queryset = self.get_page(queryset)
             except InvalidPage:
                 return Response({}, status.HTTP_400_BAD_REQUEST)
 
-        serializer = AlchemyListSerializer(queryset,
-                                           model_class=mgr.model_class(),
-                                           context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, **kwargs):
@@ -110,9 +125,9 @@ class AlchemyModelViewSet(MultipleObjectMixin, viewsets.ViewSet):
         queryset = mgr.retrieve(self.get_pks(request, **kwargs),
                                 other_pks=self.get_other_pks(request))
 
-        serializer = AlchemyModelSerializer(queryset,
-                                            model_class=mgr.model_class(),
-                                            context={'request': request})
+        serializer = self.serializer_factory(False, queryset,
+                                             mgr.model_class(),
+                                             {'request': request})
         return Response(serializer.data)
 
     def create(self, request):
