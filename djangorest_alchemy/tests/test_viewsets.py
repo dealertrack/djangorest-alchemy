@@ -241,7 +241,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
         class field are registered with viewset
         '''
 
-        class MockManager(AlchemyModelManager):
+        class MockManager(SessionMixin, AlchemyModelManager):
             model_class = mock.Mock()
             action_methods = {'method_name': ['POST', 'DELETE']}
 
@@ -263,7 +263,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
         Test if action methods return appropriate status
         '''
 
-        class MockManager(AlchemyModelManager):
+        class MockManager(SessionMixin, AlchemyModelManager):
             model_class = mock.Mock()
             action_methods = {
                 'action_method': ['POST', 'DELETE'],
@@ -278,12 +278,17 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
                 return {'status': 'created', 'result': 'some_data'}
 
             def accept_method(self, data, pk=None, **kwargs):
+                """
+                assert if self.session is available
+                """
+                assert self.session is not None
+
                 return {'status': 'accepted'}
 
             def update_method(self, data, pk=None, **kwargs):
                 return {'status': 'updated'}
 
-        class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
+        class MockViewSet(AlchemyModelViewSet, ManagerActionMethodsMixin):
             manager_class = MockManager
 
         mock_request = mock.Mock()
@@ -298,3 +303,25 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
 
         r = viewset.update_method(mock_request)
         self.assertEqual(r.status_code, status.HTTP_200_OK)
+
+    def test_action_methods_manager_exception(self):
+        '''
+        Test if action methods specified on managers raise exceptions
+        and are caught properly
+        '''
+
+        class MockManager(SessionMixin, AlchemyModelManager):
+            model_class = mock.Mock()
+            action_methods = {'method_name': ['POST', 'DELETE']}
+
+            def method_name(self, data, pk=None, **kwargs):
+                raise ValueError('Dummy exception')
+
+        class MockViewSet(AlchemyModelViewSet, ManagerActionMethodsMixin):
+            manager_class = MockManager
+
+        mock_request = mock.Mock()
+        mock_request.DATA = {}
+
+        viewset = MockViewSet()
+        self.assertRaises(ValueError, viewset.method_name, mock_request)

@@ -83,8 +83,14 @@ class MultipleObjectMixin(object):
 def make_action_method(name, methods, **kwargs):
     def func(self, request, pk=None, **kwargs):
         assert hasattr(request, 'DATA'), 'request object must have DATA attribute'
+        assert hasattr(self, 'manager_class'), 'viewset must have manager_class defined'
+        assert hasattr(self, 'manager_factory'), 'viewset must provide a manager_factory method' \
+                                                 ' to insantiate the manager'
 
-        resp = name(request.DATA, pk, **kwargs)
+        mgr = self.manager_factory(context={'request': request})
+        mgr_method = getattr(mgr, name)
+
+        resp = mgr_method(request.DATA, pk, **kwargs)
 
         # no response returned back, assume everything is fine
         if not resp:
@@ -118,7 +124,7 @@ class ActionMethodsMeta(type):
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
                 for name, methods in mgr_class.action_methods.iteritems():
-                    attrs[name] = make_action_method(getattr(mgr_class, name.lower()).__func__, methods)
+                    attrs[name] = make_action_method(name, methods)
 
         return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
 
