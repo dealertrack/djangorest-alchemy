@@ -71,7 +71,21 @@ class MultipleObjectMixin(object):
         return query_object
 
 
-class Meta(type):
+class ActionMethodsMeta(type):
+    '''
+    Meta class to read action methods from
+    manager and attach them to viewset
+    This allows us to directly call manager methods
+    without writing any action methods on viewsets
+
+    Example::
+
+        class MyManager(AlchemyModelManager):
+            action_methods = {'my_method': ['POST']}
+
+            def my_method(self, data, *args,**kwargs):
+                pass
+    '''
     def __new__(cls, name, bases, attrs):
         if 'manager_class' in attrs:
             mgr_class = attrs['manager_class']
@@ -80,8 +94,8 @@ class Meta(type):
                     attrs[name] = getattr(mgr_class, name).__func__
                     attrs[name].bind_to_methods = methods
 
-        return super(Meta, cls).__new__(cls, name, bases, attrs)
+        return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
 
 
 class ManagerActionMethodsMixin(object):
-    __metaclass__ = Meta
+    __metaclass__ = ActionMethodsMeta
