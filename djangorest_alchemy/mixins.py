@@ -123,8 +123,8 @@ class ActionMethodsMeta(type):
         if 'manager_class' in attrs:
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
-                for name, methods in mgr_class.action_methods.iteritems():
-                    attrs[name] = make_action_method(name, methods)
+                for method_name, methods in mgr_class.action_methods.iteritems():
+                    attrs[method_name] = make_action_method(method_name.lower(), methods)
 
         return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
 
