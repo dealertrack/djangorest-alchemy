@@ -245,7 +245,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
             model_class = mock.Mock()
             action_methods = {'method_name': ['POST', 'DELETE']}
 
-            def method_name(self, data, *arg, **kwargs):
+            def method_name(self, data, pk=None, **kwargs):
                 return {'status': 'created'}
 
         class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
@@ -271,30 +271,33 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
                 'update_method': ['POST']
             }
 
-            def action_method(self, data, *arg, **kwargs):
+            def action_method(self, data, pk=None, **kwargs):
                 '''
                 Return back status as 'created' and data in 'result' key
                 '''
                 return {'status': 'created', 'result': 'some_data'}
 
-            def accept_method(self, data, *arg, **kwargs):
+            def accept_method(self, data, pk=None, **kwargs):
                 return {'status': 'accepted'}
 
-            def update_method(self, data, *arg, **kwargs):
+            def update_method(self, data, pk=None, **kwargs):
                 return {'status': 'updated'}
 
         class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
             manager_class = MockManager
 
+        mock_request = mock.Mock()
+        mock_request.DATA = {}
+
         viewset = MockViewSet()
-        status = viewset.action_method({})
+        status = viewset.action_method(mock_request)
         self.assertIn('status', status)
         self.assertEqual(status['status'], 'created')
 
-        status = viewset.accept_method({})
+        status = viewset.accept_method(mock_request)
         self.assertIn('status', status)
         self.assertEqual(status['status'], 'accepted')
 
-        status = viewset.update_method({})
+        status = viewset.update_method(mock_request)
         self.assertIn('status', status)
         self.assertEqual(status['status'], 'updated')

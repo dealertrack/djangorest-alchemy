@@ -71,6 +71,18 @@ class MultipleObjectMixin(object):
         return query_object
 
 
+def make_action_method(name, methods, **kwargs):
+    def func(self, request, pk=None, **kwargs):
+        assert hasattr(request, 'DATA'), 'request object must have DATA attribute'
+
+        return name(request.DATA, pk, **kwargs)
+
+    func.bind_to_methods = methods
+    func.kwargs = kwargs
+
+    return func
+
+
 class ActionMethodsMeta(type):
     '''
     Meta class to read action methods from
@@ -83,7 +95,7 @@ class ActionMethodsMeta(type):
         class MyManager(AlchemyModelManager):
             action_methods = {'my_method': ['POST']}
 
-            def my_method(self, data, *args,**kwargs):
+            def my_method(self, data, pk=None, **kwargs):
                 pass
     '''
     def __new__(cls, name, bases, attrs):
@@ -91,8 +103,7 @@ class ActionMethodsMeta(type):
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
                 for name, methods in mgr_class.action_methods.iteritems():
-                    attrs[name] = getattr(mgr_class, name).__func__
-                    attrs[name].bind_to_methods = methods
+                    attrs[name] = make_action_method(getattr(mgr_class, name).__func__, methods)
 
         return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
 
