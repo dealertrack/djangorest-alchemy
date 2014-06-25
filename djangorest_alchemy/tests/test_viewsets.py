@@ -271,7 +271,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
                 'update_method': ['POST']
             }
 
-            def action_method(self, data, pk=None, **kwargs):
+            def action_method(self, data, *args, **kwargs):
                 '''
                 Return back status as 'created' and data in 'result' key
                 '''

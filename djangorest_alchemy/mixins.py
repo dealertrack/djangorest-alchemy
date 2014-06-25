@@ -3,7 +3,7 @@
 from django.core.paginator import Paginator, InvalidPage, Page
 from rest_framework.response import Response
 from rest_framework import status
-
+import six
 
 STATUS_CODES = {
     'created': status.HTTP_201_CREATED,
@@ -99,7 +99,7 @@ def make_action_method(name, methods, **kwargs):
 
 
 class ActionMethodsMeta(type):
-    '''
+    """
     Meta class to read action methods from
     manager and attach them to viewset
     This allows us to directly call manager methods
@@ -112,16 +112,16 @@ class ActionMethodsMeta(type):
 
             def my_method(self, data, pk=None, **kwargs):
                 pass
-    '''
+    """
     def __new__(cls, name, bases, attrs):
         if 'manager_class' in attrs:
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
                 for name, methods in mgr_class.action_methods.iteritems():
-                    attrs[name] = make_action_method(getattr(mgr_class, name).__func__, methods)
+                    attrs[name] = make_action_method(getattr(mgr_class, name.lower()).__func__, methods)
 
         return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
 
 
-class ManagerActionMethodsMixin(object):
-    __metaclass__ = ActionMethodsMeta
+class ManagerActionMethodsMixin(six.with_metaclass(ActionMethodsMeta, object)):
+    pass
