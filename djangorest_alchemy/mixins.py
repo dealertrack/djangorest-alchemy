@@ -69,3 +69,19 @@ class MultipleObjectMixin(object):
             self.paginate_query_object(query_object, page_size)
 
         return query_object
+
+
+class Meta(type):
+    def __new__(cls, name, bases, attrs):
+        if 'manager_class' in attrs:
+            mgr_class = attrs['manager_class']
+            if hasattr(mgr_class, 'action_methods'):
+                for name, methods in mgr_class.action_methods.iteritems():
+                    attrs[name] = getattr(mgr_class, name).__func__
+                    attrs[name].bind_to_methods = methods
+
+        return super(Meta, cls).__new__(cls, name, bases, attrs)
+
+
+class ManagerActionMethodsMixin(object):
+    __metaclass__ = Meta

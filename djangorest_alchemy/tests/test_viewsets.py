@@ -6,6 +6,8 @@ from utils import SessionMixin, DeclarativeModel, ClassicalModel
 from utils import CompositeKeysModel, ChildModel
 from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet
+from djangorest_alchemy.mixins import ManagerActionMethodsMixin
+
 from django.test import TestCase
 from django.conf.urls import patterns, include, url
 import datetime
@@ -14,6 +16,7 @@ import unittest
 
 from rest_framework_nested import routers
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -231,3 +234,67 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
         pks = viewset.get_other_pks(mock.Mock())
         self.assertIsNotNone(pks)
         self.assertTrue(isinstance(pks, dict))
+
+    def test_action_methods_manager_mixin(self):
+        '''
+        Test if action methods specified on managers using action_methods
+        class field are registered with viewset
+        '''
+
+        class MockManager(AlchemyModelManager):
+            model_class = mock.Mock()
+            action_methods = {'method_name': ['POST', 'DELETE']}
+
+            def method_name(self, data, *arg, **kwargs):
+                return {'status': 'created'}
+
+        class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
+            manager_class = MockManager
+
+        viewset = MockViewSet()
+        self.assertTrue(hasattr(viewset, 'method_name'))
+
+        method = getattr(viewset, 'method_name')
+        # DRF looks for methods with this attr
+        self.assertTrue(hasattr(method, 'bind_to_methods'))
+
+    def test_status_action_methods_manager(self):
+        '''
+        Test if action methods return appropriate status
+        '''
+
+        class MockManager(AlchemyModelManager):
+            model_class = mock.Mock()
+            action_methods = {
+                'action_method': ['POST', 'DELETE'],
+                'accept_method': ['POST'],
+                'update_method': ['POST']
+            }
+
+            def action_method(self, data, *arg, **kwargs):
+                '''
+                Return back status as 'created' and data in 'result' key
+                '''
+                return {'status': 'created', 'result': 'some_data'}
+
+            def accept_method(self, data, *arg, **kwargs):
+                return {'status': 'accepted'}
+
+            def update_method(self, data, *arg, **kwargs):
+                return {'status': 'updated'}
+
+        class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
+            manager_class = MockManager
+
+        viewset = MockViewSet()
+        status = viewset.action_method({})
+        self.assertIn('status', status)
+        self.assertEqual(status['status'], 'created')
+
+        status = viewset.accept_method({})
+        self.assertIn('status', status)
+        self.assertEqual(status['status'], 'accepted')
+
+        status = viewset.update_method({})
+        self.assertIn('status', status)
+        self.assertEqual(status['status'], 'updated')
