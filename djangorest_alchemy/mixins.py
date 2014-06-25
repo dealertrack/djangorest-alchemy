@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from django.core.paginator import Paginator, InvalidPage, Page
+from rest_framework.response import Response
+from rest_framework import status
+
+
+STATUS_CODES = {
+    'created': status.HTTP_201_CREATED,
+    'updated': status.HTTP_200_OK,
+    'accepted': status.HTTP_202_ACCEPTED
+}
 
 
 class MultipleObjectMixin(object):
@@ -75,7 +84,13 @@ def make_action_method(name, methods, **kwargs):
     def func(self, request, pk=None, **kwargs):
         assert hasattr(request, 'DATA'), 'request object must have DATA attribute'
 
-        return name(request.DATA, pk, **kwargs)
+        resp = name(request.DATA, pk, **kwargs)
+
+        # no response returned back, assume everything is fine
+        if not resp:
+            return Response(resp, status.HTTP_200_OK)
+
+        return Response(resp, STATUS_CODES[resp['status']])
 
     func.bind_to_methods = methods
     func.kwargs = kwargs

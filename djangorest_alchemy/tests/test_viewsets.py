@@ -290,14 +290,11 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
         mock_request.DATA = {}
 
         viewset = MockViewSet()
-        status = viewset.action_method(mock_request)
-        self.assertIn('status', status)
-        self.assertEqual(status['status'], 'created')
+        r = viewset.action_method(mock_request)
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
-        status = viewset.accept_method(mock_request)
-        self.assertIn('status', status)
-        self.assertEqual(status['status'], 'accepted')
+        r = viewset.accept_method(mock_request)
+        self.assertEqual(r.status_code, status.HTTP_202_ACCEPTED)
 
-        status = viewset.update_method(mock_request)
-        self.assertIn('status', status)
-        self.assertEqual(status['status'], 'updated')
+        r = viewset.update_method(mock_request)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
