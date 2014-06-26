@@ -155,7 +155,14 @@ using the @action decorator. However, if you have managers, then you can simply 
 on the manager and specify the action methods using `action_methods` field
 The methods have to return back appropriate status per below map.
 
-.. code-block:: python
+
+    STATUS_CODES = {
+        'created': status.HTTP_201_CREATED,
+        'updated': status.HTTP_200_OK,
+        'accepted': status.HTTP_202_ACCEPTED
+    }
+
+Example::
 
     class MyManager(AlchemyModelManager):
         action_methods = {'do_something': ['POST']}
