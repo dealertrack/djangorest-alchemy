@@ -82,10 +82,12 @@ class MultipleObjectMixin(object):
 
 def make_action_method(name, methods, **kwargs):
     def func(self, request, pk=None, **kwargs):
-        assert hasattr(request, 'DATA'), 'request object must have DATA attribute'
-        assert hasattr(self, 'manager_class'), 'viewset must have manager_class defined'
-        assert hasattr(self, 'manager_factory'), 'viewset must provide a manager_factory method' \
-                                                 ' to insantiate the manager'
+        assert hasattr(request, 'DATA'), 'request object must have DATA'
+        ' attribute'
+        assert hasattr(self, 'manager_class'), 'viewset must have'
+        ' manager_class defined'
+        assert hasattr(self, 'manager_factory'), 'viewset must provide a'
+        ' manager_factory method to insantiate the manager'
 
         mgr = self.manager_factory(context={'request': request})
         mgr_method = getattr(mgr, name)
@@ -115,8 +117,8 @@ class ManagerMeta(type):
         if 'manager_class' in attrs:
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
-                for method_name, methods in mgr_class.action_methods.iteritems():
-                    attrs[method_name] = make_action_method(method_name.lower(), methods)
+                for mname, methods in mgr_class.action_methods.iteritems():
+                    attrs[mname] = make_action_method(mname.lower(), methods)
 
         return super(ManagerMeta, cls).__new__(cls, name, bases, attrs)
 
