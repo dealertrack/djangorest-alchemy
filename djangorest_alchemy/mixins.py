@@ -104,20 +104,12 @@ def make_action_method(name, methods, **kwargs):
     return func
 
 
-class ActionMethodsMeta(type):
+class ManagerMeta(type):
     """
     Meta class to read action methods from
     manager and attach them to viewset
     This allows us to directly call manager methods
     without writing any action methods on viewsets
-
-    Example::
-
-        class MyManager(AlchemyModelManager):
-            action_methods = {'my_method': ['POST']}
-
-            def my_method(self, data, pk=None, **kwargs):
-                pass
     """
     def __new__(cls, name, bases, attrs):
         if 'manager_class' in attrs:
@@ -126,8 +118,33 @@ class ActionMethodsMeta(type):
                 for method_name, methods in mgr_class.action_methods.iteritems():
                     attrs[method_name] = make_action_method(method_name.lower(), methods)
 
-        return super(ActionMethodsMeta, cls).__new__(cls, name, bases, attrs)
+        return super(ManagerMeta, cls).__new__(cls, name, bases, attrs)
 
 
-class ManagerActionMethodsMixin(six.with_metaclass(ActionMethodsMeta, object)):
-    pass
+class ManagerMixin(six.with_metaclass(ManagerMeta, object)):
+    """
+    Manager mixin allows to use a manager class
+    to provide the actual CRUD implementation in
+    addition to providing action methods
+
+    Example::
+
+        class MyManager(AlchemyModelManager):
+            action_methods = {'my_method': ['POST']}
+
+            def my_method(self, data, pk=None, **kwargs):
+                # data is actual payload
+                return {'status': 'created'}
+
+        class MyViewSet(viewset.Viewsets, ManagerMixin):
+            manager_class = MyManager
+    """
+
+    def manager_factory(self, *args, **kwargs):
+        '''
+        Factory method for instantiating manager class
+        Override to return back your instance
+        '''
+        assert hasattr(self, 'manager_class'), \
+            "manager_class has to be specified"
+        return self.manager_class(*args, **kwargs)

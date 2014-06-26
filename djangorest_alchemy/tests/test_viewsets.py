@@ -6,7 +6,7 @@ from utils import SessionMixin, DeclarativeModel, ClassicalModel
 from utils import CompositeKeysModel, ChildModel
 from djangorest_alchemy.managers import AlchemyModelManager
 from djangorest_alchemy.viewsets import AlchemyModelViewSet
-from djangorest_alchemy.mixins import ManagerActionMethodsMixin
+from djangorest_alchemy.mixins import ManagerMixin
 
 from django.test import TestCase
 from django.conf.urls import patterns, include, url
@@ -248,7 +248,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
             def method_name(self, data, pk=None, **kwargs):
                 return {'status': 'created'}
 
-        class MockViewSet(viewsets.ViewSet, ManagerActionMethodsMixin):
+        class MockViewSet(viewsets.ViewSet, ManagerMixin):
             manager_class = MockManager
 
         viewset = MockViewSet()
@@ -288,7 +288,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
             def update_method(self, data, pk=None, **kwargs):
                 return {'status': 'updated'}
 
-        class MockViewSet(AlchemyModelViewSet, ManagerActionMethodsMixin):
+        class MockViewSet(AlchemyModelViewSet, ManagerMixin):
             manager_class = MockManager
 
         mock_request = mock.Mock()
@@ -317,7 +317,7 @@ class TestAlchemyViewSetUnit(unittest.TestCase):
             def method_name(self, data, pk=None, **kwargs):
                 raise ValueError('Dummy exception')
 
-        class MockViewSet(AlchemyModelViewSet, ManagerActionMethodsMixin):
+        class MockViewSet(AlchemyModelViewSet, ManagerMixin):
             manager_class = MockManager
 
         mock_request = mock.Mock()
