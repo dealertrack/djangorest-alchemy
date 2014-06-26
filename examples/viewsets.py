@@ -7,6 +7,10 @@ from models import SessionMixin
 
 class CarManager(SessionMixin, AlchemyModelManager):
     model_class = Car
+    action_methods = {'change_engine': ['GET', 'POST']}
+
+    def change_engine(self, data, pk=None, **kwargs):
+        return {'status': 'created'}
 
 
 class CarViewSet(AlchemyModelViewSet):

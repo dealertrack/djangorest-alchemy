@@ -9,25 +9,17 @@ from rest_framework import status
 from djangorest_alchemy.serializers import AlchemyModelSerializer
 from djangorest_alchemy.serializers import AlchemyListSerializer
 from djangorest_alchemy.mixins import MultipleObjectMixin
+from djangorest_alchemy.mixins import ManagerMixin
 
 from django.core.paginator import InvalidPage
 
 
-class AlchemyModelViewSet(MultipleObjectMixin, viewsets.ViewSet):
+class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
     """
     Generic SQLAlchemy viewset which calls
     methods over the specified manager_class and
     uses specified serializer_class
     """
-
-    def manager_factory(self, *args, **kwargs):
-        '''
-        Factory method for instantiating manager class
-        Override to return back your instance
-        '''
-        assert hasattr(self, 'manager_class'), \
-            "manager_class has to be specified"
-        return self.manager_class(*args, **kwargs)
 
     def serializer_factory(self, multiple, queryset, model_class, context):
         '''

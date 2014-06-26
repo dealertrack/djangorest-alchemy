@@ -151,16 +151,27 @@ For more details, refer to the drf-nested-routers documentation.
 **Custom methods**
 
 DRF allows to add custom methods other than the default list, retrieve, create, update and destroy
+using the @action decorator. However, if you have managers, then you can simply provide action methods
+on the manager and specify the action methods using `action_methods` field
+The methods have to return back appropriate status per below map.
 
 
-Example::
+    STATUS_CODES = {
+        'created': status.HTTP_201_CREATED,
+        'updated': status.HTTP_200_OK,
+        'accepted': status.HTTP_202_ACCEPTED
+    }
 
-    @action(methods=['POST'])
-    def do_something(self, request, pk=None, **kwargs):
-        mgr = self.manager_factory()
-        # Delegate to manager method
-        mgr.do_something(request.DATA, pk=pk, **kwargs)
-        return Response({'status': 'did_something'}, status=status.HTTP_200_OK)
+
+    class MyManager(AlchemyModelManager):
+        action_methods = {'do_something': ['POST']}
+
+        def do_something(self, data, pk=None, **kwargs):
+            # data is actual payload
+            return {'status': 'created'}
+
+    class ModelViewSet(AlchemyModelViewSet):
+            manager_class = MyManager
 
 ```curl -X POST http://server/api/declmodels/1/do_something/```
 

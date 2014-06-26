@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from django.core.paginator import Paginator, InvalidPage, Page
+from rest_framework.response import Response
+from rest_framework import status
+import six
+
+STATUS_CODES = {
+    'created': status.HTTP_201_CREATED,
+    'updated': status.HTTP_200_OK,
+    'accepted': status.HTTP_202_ACCEPTED
+}
 
 
 class MultipleObjectMixin(object):
@@ -69,3 +78,73 @@ class MultipleObjectMixin(object):
             self.paginate_query_object(query_object, page_size)
 
         return query_object
+
+
+def make_action_method(name, methods, **kwargs):
+    def func(self, request, pk=None, **kwargs):
+        assert hasattr(request, 'DATA'), 'request object must have DATA attribute'
+        assert hasattr(self, 'manager_class'), 'viewset must have manager_class defined'
+        assert hasattr(self, 'manager_factory'), 'viewset must provide a manager_factory method' \
+                                                 ' to insantiate the manager'
+
+        mgr = self.manager_factory(context={'request': request})
+        mgr_method = getattr(mgr, name)
+
+        resp = mgr_method(request.DATA, pk, **kwargs)
+
+        # no response returned back, assume everything is fine
+        if not resp:
+            return Response(resp, status.HTTP_200_OK)
+
+        return Response(resp, STATUS_CODES[resp['status']])
+
+    func.bind_to_methods = methods
+    func.kwargs = kwargs
+
+    return func
+
+
+class ManagerMeta(type):
+    """
+    Meta class to read action methods from
+    manager and attach them to viewset
+    This allows us to directly call manager methods
+    without writing any action methods on viewsets
+    """
+    def __new__(cls, name, bases, attrs):
+        if 'manager_class' in attrs:
+            mgr_class = attrs['manager_class']
+            if hasattr(mgr_class, 'action_methods'):
+                for method_name, methods in mgr_class.action_methods.iteritems():
+                    attrs[method_name] = make_action_method(method_name.lower(), methods)
+
+        return super(ManagerMeta, cls).__new__(cls, name, bases, attrs)
+
+
+class ManagerMixin(six.with_metaclass(ManagerMeta, object)):
+    """
+    Manager mixin allows to use a manager class
+    to provide the actual CRUD implementation in
+    addition to providing action methods
+
+    Example::
+
+        class MyManager(AlchemyModelManager):
+            action_methods = {'my_method': ['POST']}
+
+            def my_method(self, data, pk=None, **kwargs):
+                # data is actual payload
+                return {'status': 'created'}
+
+        class MyViewSet(viewset.Viewsets, ManagerMixin):
+            manager_class = MyManager
+    """
+
+    def manager_factory(self, *args, **kwargs):
+        '''
+        Factory method for instantiating manager class
+        Override to return back your instance
+        '''
+        assert hasattr(self, 'manager_class'), \
+            "manager_class has to be specified"
+        return self.manager_class(*args, **kwargs)
