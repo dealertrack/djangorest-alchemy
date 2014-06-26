@@ -162,7 +162,6 @@ The methods have to return back appropriate status per below map.
         'accepted': status.HTTP_202_ACCEPTED
     }
 
-Example::
 
     class MyManager(AlchemyModelManager):
         action_methods = {'do_something': ['POST']}
