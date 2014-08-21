@@ -55,7 +55,8 @@ session = Session()
 
 for i in range(0, 50):
     car = Car(car_id=i, make='Toyota', model='Prius', year='2014')
-    part = Part(car_id=i, part_id=i + 1, part_description='Engine', part_num=random.randint(0, 1000))
+    part = Part(car_id=i, part_id=i + 1, part_description='Engine',
+                part_num=random.randint(0, 1000))
     session.add(car)
     session.add(part)
 

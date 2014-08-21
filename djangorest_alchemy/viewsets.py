@@ -81,15 +81,15 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
 
-        serializer = self.serializer_factory(True, queryset,
-                                             mgr.model_class(),
-                                             {'request': request})
-
         if self.paginate_by:
             try:
                 queryset = self.get_page(queryset)
             except InvalidPage:
                 return Response({}, status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.serializer_factory(True, queryset,
+                                             mgr.model_class(),
+                                             {'request': request})
 
         return Response(serializer.data)
 

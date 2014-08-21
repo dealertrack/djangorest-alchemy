@@ -51,6 +51,16 @@ class AlchemyModelSerializer(serializers.Serializer):
 
         mapper = class_mapper(self.cls.__class__)
 
+        try:
+            # URI field for get pk field
+            pk_field = primary_key(self.cls.__class__)
+        except KeyNotFoundException:
+            return ret
+
+        r = self.context['request']
+        ret['href'] = AlchemyUriField(source=pk_field,
+                                      path=r.build_absolute_uri(r.path))
+
         # Get all the Column fields
         for col_prop in mapper.iterate_properties:
             if isinstance(col_prop, ColumnProperty):
@@ -66,7 +76,6 @@ class AlchemyModelSerializer(serializers.Serializer):
         for rel_prop in mapper.iterate_properties:
             if isinstance(rel_prop, RelationshipProperty):
                 field_nm = str(rel_prop).split('.')[1]
-                r = self.context['request']
                 # many becomes same as uselist so that
                 # RelatedField can iterate over the queryset
                 ret[field_nm] = AlchemyRelatedField(source=field_nm,
@@ -88,8 +97,8 @@ class AlchemyListSerializer(AlchemyModelSerializer):
             return ret
 
         request = self.context['request']
-        ret[pk_field] = AlchemyUriField(source=pk_field,
-                                        path=request.build_absolute_uri(
-                                            request.path))
+        ret["href"] = AlchemyUriField(source=pk_field,
+                                      path=request.build_absolute_uri(
+                                          request.path))
 
         return ret
