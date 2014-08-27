@@ -175,6 +175,11 @@ The methods have to return back appropriate status per below map.
 
 ```curl -X POST http://server/api/declmodels/1/do_something/```
 
+**Read-only API**
+
+If you need only the GET method, and do not wish to expose/support POST/PUT/DELETE
+then you can use the `djangorest_alchemy.routers.ReadOnlyRouter` instead of the
+DefaultRouter
 
 Examples
 --------
