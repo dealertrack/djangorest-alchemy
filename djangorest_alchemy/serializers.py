@@ -7,7 +7,7 @@ from rest_framework.fields import (CharField, IntegerField, DateTimeField,
                                    FloatField, BooleanField)
 from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
                               CHAR, TIMESTAMP, DATE, Float, BigInteger,
-                              Numeric, DateTime, Boolean)
+                              Numeric, DateTime, Boolean, CLOB)
 from django.utils.datastructures import SortedDict
 from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
@@ -36,6 +36,7 @@ class AlchemyModelSerializer(serializers.Serializer):
         Numeric: IntegerField,
         DateTime: DateTimeField,
         Boolean: BooleanField,
+        CLOB: CharField
     }
 
     def __init__(self, *args, **kwargs):
