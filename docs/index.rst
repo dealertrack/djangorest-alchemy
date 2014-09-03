@@ -13,11 +13,10 @@ Contents:
 
    readme
    installation
-   usage
+   api/modules
    contributing
    authors
    history
-   api/modules
 
 Indices and tables
 ==================

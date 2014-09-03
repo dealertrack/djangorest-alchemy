@@ -1,13 +1,6 @@
 djangorest_alchemy package
 ==========================
 
-Subpackages
------------
-
-.. toctree::
-
-    djangorest_alchemy.tests
-
 Submodules
 ----------
 
