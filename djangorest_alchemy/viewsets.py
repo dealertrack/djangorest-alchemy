@@ -62,13 +62,17 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
     def list(self, request, **kwargs):
         '''
         Returns back serialized list of objects URIs
+        in the `results` key
 
         :return: json
-            [
+            {
+               "results":
+               [
                 {
-                    "pk": "http://server/api/models/pk/"
+                    "href": "http://server/api/models/pk/"
                 }
-            ]
+               ]
+             }
 
         Note::
 
@@ -91,7 +95,7 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
                                              mgr.model_class(),
                                              {'request': request})
 
-        return Response(serializer.data)
+        return Response({"results": serializer.data})
 
     def retrieve(self, request, **kwargs):
         '''
@@ -99,7 +103,7 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
 
         :return: json
             {
-                "pk": "value",
+                "href": "http://server/api/models/pk/",
                 "field": "value"
                 "childmodel": "http://serv/api/parentmodels/pk/childmodels/pk"
             }

@@ -21,6 +21,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 
+RESULTS_KEY = "results"
+
+
 class PrimaryKeyMixin(object):
 
     def get_other_pks(self, request):
@@ -36,8 +39,7 @@ class DeclarativeModelManager(SessionMixin, AlchemyModelManager):
     model_class = DeclarativeModel
 
     def do_something(self, data, pk=None, **kwargs):
-        print "DO SOMETHING"
-        print data, pk
+        pass
 
 
 class DeclModelViewSet(AlchemyModelViewSet):
@@ -99,13 +101,12 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_decl_list(self):
         resp = self.client.get('/api/declmodels/')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
 
     def test_decl_retrieve(self):
         resp = self.client.get('/api/declmodels/1/')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['declarativemodel_id'], 1)
@@ -116,13 +117,12 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_classical_list(self):
         resp = self.client.get('/api/clsmodels/?field=test')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
 
     def test_classical_retrieve(self):
         resp = self.client.get('/api/clsmodels/1/')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['classicalmodel_id'], 1)
@@ -135,7 +135,6 @@ class TestAlchemyViewSetIntegration(TestCase):
     def test_with_multiple_pk_retrieve(self):
         resp = self.client.get('/api/compositemodels/1/',
                                PK1='ABCD', PK2='WXYZ')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(not type(resp.data) is list)
         self.assertEqual(resp.data['compositekeysmodel_id'], 1)
@@ -144,7 +143,6 @@ class TestAlchemyViewSetIntegration(TestCase):
 
     def test_hierarchical_multiple_pk_retrieve(self):
         resp = self.client.get('/api/declmodels/1/childmodels/2/')
-        print resp.data
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertEqual(resp.data['childmodel_id'], 2)
         self.assertEqual(resp.data['parent_id'], 1)
@@ -156,25 +154,25 @@ class TestAlchemyViewSetIntegration(TestCase):
     def test_basic_filter(self):
         resp = self.client.get('/api/declmodels/?field=test')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
-        self.assertTrue(len(resp.data) == 1)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
 
     def test_invalid_filter(self):
         resp = self.client.get('/api/declmodels/?field=invalid')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
-        self.assertTrue(len(resp.data) == 0)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 0)
 
     def test_basic_pagination(self):
         resp = self.client.get('/api/declmodels/?page=1')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
-        self.assertTrue(len(resp.data) == 1)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
 
         resp = self.client.get('/api/declmodels/?page=last')
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
-        self.assertTrue(type(resp.data) is list)
-        self.assertTrue(len(resp.data) == 1)
+        self.assertTrue(type(resp.data) is dict)
+        self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
 
     def test_invalid_pagination(self):
         resp = self.client.get('/api/declmodels/?page=foo')
