@@ -1,6 +1,12 @@
 djangorest-alchemy
 ===============================
 
+.. image:: https://readthedocs.org/projects/djangorest-alchemy/badge/?version=latest
+    :target: http://djangorest-alchemy.readthedocs.org
+
+.. image:: https://travis-ci.org/dealertrack/djangorest-alchemy.svg?branch=master
+    :target: https://travis-ci.org/dealertrack/djangorest-alchemy
+    
 A library to integrate the awesome frameworks Django REST Framework and SQLAlchemy
 
 * Free software: MIT license
