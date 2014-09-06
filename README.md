@@ -5,6 +5,7 @@ A library to integrate the awesome frameworks Django REST Framework and SQLAlche
 
 * Free software: MIT license
 * Supports SQLAlchemy 0.7.8 and above
+* Tested with Django 1.4
 
 
 Features
