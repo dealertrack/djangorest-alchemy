@@ -1,6 +1,9 @@
 djangorest-alchemy
 ===============================
 
+[![](https://readthedocs.org/projects/djangorest-alchemy/badge/?version=latest)](http://djangorest-alchemy.readthedocs.org/) 
+[![](https://travis-ci.org/dealertrack/djangorest-alchemy.svg?branch=master)](http://travis-ci.org/dealertrack/djangorest-alchemy)
+
     
 A library to integrate the awesome frameworks Django REST Framework and SQLAlchemy
 
