@@ -1,5 +1,6 @@
 import unittest
 from djangorest_alchemy.apibuilder import APIModelBuilder
+import mock
 
 
 class TestAPIBuilder(unittest.TestCase):
@@ -16,8 +17,8 @@ class TestAPIBuilder(unittest.TestCase):
             pass
 
         class SessionMixin(object):
-            pass
+            def __init__(self):
+                self.session = mock.Mock()
 
         builder = APIModelBuilder([Model, Model2], SessionMixin)
         self.assertIsNotNone(builder.urls)
-

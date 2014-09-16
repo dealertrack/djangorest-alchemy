@@ -8,22 +8,25 @@ from djangorest_alchemy.apibuilder import APIModelBuilder
 from viewsets import CarViewSet
 from viewsets import PartViewSet
 
-from models import Car, Part, SessionMixin
+from models import SessionMixin
 
-#viewset_router = routers.SimpleRouter()
-#viewset_router.register(r'api/cars_foo', CarViewSet,
-#                        base_name='car')
+viewset_router = routers.SimpleRouter()
+viewset_router.register(r'api/cars', CarViewSet,
+                        base_name='car')
 
 # Register the child model
-#child_router = routers.NestedSimpleRouter(viewset_router, r'api/cars_foo',
-#                                          lookup='cars')
-#child_router.register("parts", PartViewSet,
-#                      base_name='part')
+child_router = routers.NestedSimpleRouter(viewset_router, r'api/cars',
+                                          lookup='cars')
+child_router.register("parts", PartViewSet,
+                      base_name='part')
 
 
-builder = APIModelBuilder([Car, Part], SessionMixin)
+# Demonstrate dynamic API builder featire
+from djangorest_alchemy.model_cache import model_cache
+
+builder = APIModelBuilder(model_cache.models, SessionMixin)
 urlpatterns = patterns('',
-                       #url(r'^', include(viewset_router.urls)),
-                       #url(r'^', include(child_router.urls)),
+                       url(r'^', include(viewset_router.urls)),
+                       url(r'^', include(child_router.urls)),
                        url(r'^', include(builder.urls)),
                        )
