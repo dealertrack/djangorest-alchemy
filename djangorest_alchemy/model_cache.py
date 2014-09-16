@@ -25,7 +25,7 @@ def module_walk(root_module, include_self=True):
         path = os.path.abspath(path)
 
         for file in files:
-            if not file.rsplit('.', 1)[1] == 'py':
+            if not file.rsplit('.', 1)[-1] == 'py':
                 continue
 
             if file == '__init__.py':
@@ -33,11 +33,15 @@ def module_walk(root_module, include_self=True):
 
             file = os.path.join(path, file)
             file = file.replace(root_path + os.sep, '')
+            file = file.rsplit('.', 1)[0]
+
+            if '.' in file:
+                continue
 
             module_path = '.'.join(filter(
                 None,
                 root_module.__name__.split('.')
-                + file.rsplit('.', 1)[0].split(os.sep)
+                + file.split(os.sep)
             ))
 
             module = importlib.import_module(module_path)
