@@ -4,14 +4,25 @@ Build dynamic API based on the provided SQLAlchemy model
 """
 from viewsets import AlchemyModelViewSet
 from rest_framework_nested import routers
-from managers import AlchemyModelManager
 
 
 class APIModelBuilder(object):
-
-    def __init__(self, models, SessionMixin, *args, **kwargs):
+    def __init__(self,
+                 models,
+                 base_managers,
+                 base_viewsets=None,
+                 *args, **kwargs):
         self.models = models
-        self.SessionMixin = SessionMixin
+
+        if not isinstance(base_managers, (tuple, list)):
+            base_managers = [base_managers]
+        if not isinstance(base_managers, tuple):
+            base_managers = tuple(base_managers)
+        if base_viewsets is None:
+            base_viewsets = (AlchemyModelViewSet,)
+
+        self.base_managers = base_managers
+        self.base_viewsets = base_viewsets
 
     @property
     def urls(self):
@@ -21,14 +32,14 @@ class APIModelBuilder(object):
 
             manager = type(
                 str('{}Manager'.format(model.__name__)),
-                (self.SessionMixin, AlchemyModelManager,),
+                self.base_managers,
                 {
                     'model_class': model,
                 }
             )
             viewset = type(
                 str('{}ModelViewSet'.format(model.__name__)),
-                (AlchemyModelViewSet,),
+                self.base_viewsets,
                 {
                     'manager_class': manager,
                 }

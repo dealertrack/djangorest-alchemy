@@ -11,10 +11,15 @@ def module_walk(root_module, include_self=True):
     if isinstance(root_module, six.string_types):
         root_module = importlib.import_module(root_module)
 
-    root_path = os.path.abspath(os.path.dirname(root_module.__file__))
-
     if include_self:
         yield root_module
+
+    root_path = os.path.abspath(root_module.__file__)
+
+    if '__init__' not in os.path.basename(root_path):
+        return
+
+    root_path = os.path.dirname(root_path)
 
     for path, dirs, files in os.walk(root_path):
         path = os.path.abspath(path)

@@ -4,6 +4,8 @@ Url registrations
 from django.conf.urls import patterns, include, url
 from rest_framework_nested import routers
 from djangorest_alchemy.apibuilder import APIModelBuilder
+from djangorest_alchemy.managers import AlchemyModelManager
+
 
 from viewsets import CarViewSet
 from viewsets import PartViewSet
@@ -24,7 +26,8 @@ child_router.register("parts", PartViewSet,
 # Demonstrate dynamic API builder featire
 from djangorest_alchemy.model_cache import model_cache
 
-builder = APIModelBuilder(model_cache.models, SessionMixin)
+builder = APIModelBuilder(model_cache.models,
+                          (SessionMixin, AlchemyModelManager))
 urlpatterns = patterns('',
                        url(r'^', include(viewset_router.urls)),
                        url(r'^', include(child_router.urls)),
