@@ -31,6 +31,7 @@ class APIModelBuilder(object):
                 (AlchemyModelViewSet,),
                 {
                     'manager_class': manager,
+                    'paginate_by': 10,
                 }
             )
 
