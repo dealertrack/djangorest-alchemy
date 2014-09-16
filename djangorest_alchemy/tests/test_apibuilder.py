@@ -5,6 +5,9 @@ from djangorest_alchemy.apibuilder import APIModelBuilder
 class TestAPIBuilder(unittest.TestCase):
 
     def test_urls(self):
+        """
+        Test basic urls property
+        """
 
         class Model(object):
             pass
@@ -12,5 +15,9 @@ class TestAPIBuilder(unittest.TestCase):
         class Model2(object):
             pass
 
-        builder = APIModelBuilder([Model, Model2])
-        print builder.urls
+        class SessionMixin(object):
+            pass
+
+        builder = APIModelBuilder([Model, Model2], SessionMixin)
+        self.assertIsNotNone(builder.urls)
+
