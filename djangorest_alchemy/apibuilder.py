@@ -2,6 +2,7 @@
 API Builder
 Build dynamic API based on the provided SQLAlchemy model
 """
+from managers import AlchemyModelManager
 from viewsets import AlchemyModelViewSet
 from rest_framework_nested import routers
 
@@ -32,7 +33,7 @@ class APIModelBuilder(object):
 
             manager = type(
                 str('{}Manager'.format(model.__name__)),
-                self.base_managers,
+                self.base_managers + (AlchemyModelManager,),
                 {
                     'model_class': model,
                 }
