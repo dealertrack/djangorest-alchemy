@@ -79,7 +79,6 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
             * URI contains the same pk field
             * Complete URI with server/port is returned back
         '''
-
         mgr = self.manager_factory(context={'request': request})
 
         queryset = mgr.list(other_pks=self.get_other_pks(request),

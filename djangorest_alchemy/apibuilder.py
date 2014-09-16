@@ -43,6 +43,7 @@ class APIModelBuilder(object):
                 self.base_viewsets,
                 {
                     'manager_class': manager,
+                    'paginate_by': 10,
                 }
             )
 
