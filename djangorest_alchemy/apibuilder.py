@@ -47,7 +47,8 @@ class APIModelBuilder(object):
                 }
             )
 
-            router.register('data-api/' + model.__name__.lower() + 's', viewset,
+            router.register('data-api/' + model.__name__.lower() + 's',
+                            viewset,
                             base_name=model.__name__)
 
         return router.urls
