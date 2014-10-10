@@ -7,7 +7,7 @@ from rest_framework.fields import (CharField, IntegerField, DateTimeField,
                                    FloatField, BooleanField)
 from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
                               CHAR, TIMESTAMP, DATE, Float, BigInteger,
-                              Numeric, DateTime, Boolean, CLOB)
+                              Numeric, DateTime, Boolean, CLOB, DECIMAL)
 from django.utils.datastructures import SortedDict
 from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
 # inspect introduced in 0.8
@@ -36,7 +36,8 @@ class AlchemyModelSerializer(serializers.Serializer):
         Numeric: IntegerField,
         DateTime: DateTimeField,
         Boolean: BooleanField,
-        CLOB: CharField
+        CLOB: CharField,
+        DECIMAL: FloatField,
     }
 
     def __init__(self, *args, **kwargs):
@@ -52,15 +53,14 @@ class AlchemyModelSerializer(serializers.Serializer):
 
         mapper = class_mapper(self.cls.__class__)
 
+        r = self.context['request']
         try:
             # URI field for get pk field
             pk_field = primary_key(self.cls.__class__)
+            ret['href'] = AlchemyUriField(source=pk_field,
+                                          path=r.build_absolute_uri(r.path))
         except KeyNotFoundException:
-            return ret
-
-        r = self.context['request']
-        ret['href'] = AlchemyUriField(source=pk_field,
-                                      path=r.build_absolute_uri(r.path))
+            pass
 
         # Get all the Column fields
         for col_prop in mapper.iterate_properties:
@@ -94,12 +94,12 @@ class AlchemyListSerializer(AlchemyModelSerializer):
         try:
             # URI field for get pk field
             pk_field = primary_key(self.cls.__class__)
-        except KeyNotFoundException:
-            return ret
 
-        request = self.context['request']
-        ret["href"] = AlchemyUriField(source=pk_field,
-                                      path=request.build_absolute_uri(
-                                          request.path))
+            request = self.context['request']
+            ret["href"] = AlchemyUriField(source=pk_field,
+                                          path=request.build_absolute_uri
+                                          (request.path))
+        except KeyNotFoundException:
+            return super(AlchemyListSerializer, self).get_default_fields()
 
         return ret

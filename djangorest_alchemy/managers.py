@@ -28,7 +28,7 @@ class AlchemyModelManager(object):
         try:
             pk = primary_key(self.cls)
         except KeyNotFoundException:
-            return list()
+            pk = None
 
         filter_dict = dict()
 
@@ -48,14 +48,28 @@ class AlchemyModelManager(object):
                     query_pks[key] = other_pks[key]
 
             query_pks.update(filter_dict)
-            queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
-                **query_pks).all()
+
+            if pk:
+                queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
+                    **query_pks).all()
+            else:
+                queryset = self.session.query(self.cls).filter_by(
+                    **query_pks).all()
         else:
             if filter_dict:
-                queryset = self.session.query(self.cls.__dict__[pk]).filter_by(
-                    **filter_dict).all()
+                if pk:
+                    queryset = self.session.query(
+                        self.cls.__dict__[pk]).filter_by(
+                        **filter_dict).all()
+                else:
+                    queryset = self.session.query(self.cls).filter_by(
+                        **filter_dict).all()
             else:
-                queryset = self.session.query(self.cls.__dict__[pk]).all()
+                if pk:
+                    queryset = self.session.query(self.cls.__dict__[pk]).all()
+                else:
+                    # Limit to 1000 rows, this is worst case scenario
+                    queryset = self.session.query(self.cls).limit(1000).all()
 
         return queryset
 

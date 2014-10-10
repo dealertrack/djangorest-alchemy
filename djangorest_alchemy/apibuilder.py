@@ -30,7 +30,6 @@ class APIModelBuilder(object):
         router = routers.SimpleRouter()
 
         for model in self.models:
-
             manager = type(
                 str('{}Manager'.format(model.__name__)),
                 self.base_managers + (AlchemyModelManager,),
