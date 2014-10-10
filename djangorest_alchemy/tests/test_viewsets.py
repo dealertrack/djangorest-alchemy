@@ -22,6 +22,8 @@ from rest_framework.decorators import action
 
 
 RESULTS_KEY = "results"
+COUNT_KEY = "count"
+PAGE_KEY = "page"
 
 
 class PrimaryKeyMixin(object):
@@ -104,6 +106,8 @@ class TestAlchemyViewSetIntegration(TestCase):
         self.assertTrue(resp.status_code is status.HTTP_200_OK)
         self.assertTrue(type(resp.data) is dict)
         self.assertTrue(len(resp.data[RESULTS_KEY]) == 1)
+        self.assertTrue(resp.data[COUNT_KEY] == 1)
+        self.assertTrue(resp.data[PAGE_KEY] == 25)
 
     def test_decl_retrieve(self):
         resp = self.client.get('/api/declmodels/1/')
