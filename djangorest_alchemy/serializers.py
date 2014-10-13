@@ -4,7 +4,7 @@ SQLALchemy and DRF fields to serialize/deserialize objects
 '''
 from rest_framework import serializers
 from rest_framework.fields import (CharField, IntegerField, DateTimeField,
-                                   FloatField, BooleanField)
+                                   FloatField, BooleanField, DecimalField)
 from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
                               CHAR, TIMESTAMP, DATE, Float, BigInteger,
                               Numeric, DateTime, Boolean, CLOB, DECIMAL)
@@ -37,12 +37,14 @@ class AlchemyModelSerializer(serializers.Serializer):
         DateTime: DateTimeField,
         Boolean: BooleanField,
         CLOB: CharField,
-        DECIMAL: FloatField,
+        DECIMAL: DecimalField,
     }
 
     def __init__(self, *args, **kwargs):
         assert "model_class" in kwargs, \
             "model_class should be passed"
+        assert 'request' in kwargs['context'], \
+            "Context must contain request object"
 
         self.cls = kwargs.pop('model_class')
         super(AlchemyModelSerializer, self).__init__(*args, **kwargs)
