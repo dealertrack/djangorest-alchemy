@@ -84,6 +84,8 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
 
+        count = len(queryset)
+
         if self.paginate_by:
             try:
                 queryset = self.get_page(queryset)
@@ -94,7 +96,9 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
                                              mgr.model_class(),
                                              {'request': request})
 
-        return Response({"results": serializer.data})
+        return Response({"count": count,
+                         "page": self.paginate_by,
+                         "results": serializer.data})
 
     def retrieve(self, request, **kwargs):
         '''
