@@ -31,8 +31,7 @@ setup(
     package_dir={'djangorest_alchemy':
                  'djangorest_alchemy'},
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=open("requirements.txt").readlines(),
     license="BSD",
     zip_safe=False,
     keywords='djangorest-alchemy',
