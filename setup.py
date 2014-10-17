@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='djangorest-alchemy',
-    version='0.1.2',
+    version='0.1.3',
     description='Django REST Framework and SQLAlchemy integration',
     long_description=readme + '\n\n' + history,
     author='Ashish Gore',
