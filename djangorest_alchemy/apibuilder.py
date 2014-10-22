@@ -4,7 +4,7 @@ Build dynamic API based on the provided SQLAlchemy model
 """
 from managers import AlchemyModelManager
 from viewsets import AlchemyModelViewSet
-from rest_framework_nested import routers
+from routers import ReadOnlyRouter
 
 
 class APIModelBuilder(object):
@@ -27,7 +27,7 @@ class APIModelBuilder(object):
 
     @property
     def urls(self):
-        router = routers.SimpleRouter()
+        router = ReadOnlyRouter()
 
         for model in self.models:
             manager = type(
