@@ -19,7 +19,7 @@ history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 setup(
     name='djangorest-alchemy',
-    version='0.1.0',
+    version='0.1.3',
     description='Django REST Framework and SQLAlchemy integration',
     long_description=readme + '\n\n' + history,
     author='Ashish Gore',
@@ -31,8 +31,7 @@ setup(
     package_dir={'djangorest_alchemy':
                  'djangorest_alchemy'},
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=open("requirements.txt").readlines(),
     license="BSD",
     zip_safe=False,
     keywords='djangorest-alchemy',

@@ -123,6 +123,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
+SA_MODEL_LOADER = ('models',)
+
 # DJANGO REST FRAMEWORK SETTINGS
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
