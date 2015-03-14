@@ -79,11 +79,12 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
             * URI contains the same pk field
             * Complete URI with server/port is returned back
         '''
-
         mgr = self.manager_factory(context={'request': request})
 
         queryset = mgr.list(other_pks=self.get_other_pks(request),
                             filters=request.QUERY_PARAMS)
+
+        count = len(queryset)
 
         if self.paginate_by:
             try:
@@ -95,7 +96,9 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
                                              mgr.model_class(),
                                              {'request': request})
 
-        return Response({"results": serializer.data})
+        return Response({"count": count,
+                         "page": self.paginate_by,
+                         "results": serializer.data})
 
     def retrieve(self, request, **kwargs):
         '''
