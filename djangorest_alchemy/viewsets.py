@@ -27,13 +27,17 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         Override to return back your instance
         '''
         if multiple:
-            return AlchemyListSerializer(queryset,
-                                         model_class=model_class,
-                                         context=context)
+            s = AlchemyListSerializer(instance=queryset,
+                                      model_class=model_class,
+                                      context=context)
         else:
-            return AlchemyModelSerializer(queryset,
-                                          model_class=model_class,
-                                          context=context)
+            s = AlchemyModelSerializer(instance=queryset,
+                                       model_class=model_class,
+                                       context=context)
+
+        #s.is_valid()
+        #print s.errors
+        return s
 
     def get_other_pks(self, request):
         '''

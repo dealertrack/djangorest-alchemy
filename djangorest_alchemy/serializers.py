@@ -49,7 +49,7 @@ class AlchemyModelSerializer(serializers.Serializer):
         self.cls = kwargs.pop('model_class')
         super(AlchemyModelSerializer, self).__init__(*args, **kwargs)
 
-    def get_default_fields(self):
+    def get_fields(self):
 
         ret = SortedDict()
 
@@ -90,7 +90,7 @@ class AlchemyModelSerializer(serializers.Serializer):
 
 
 class AlchemyListSerializer(AlchemyModelSerializer):
-    def get_default_fields(self):
+    def get_fields(self):
         ret = SortedDict()
 
         try:
@@ -102,6 +102,6 @@ class AlchemyListSerializer(AlchemyModelSerializer):
                                           path=request.build_absolute_uri
                                           (request.path))
         except KeyNotFoundException:
-            return super(AlchemyListSerializer, self).get_default_fields()
+            return super(AlchemyListSerializer, self).get_fields()
 
         return ret
