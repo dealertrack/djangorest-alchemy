@@ -3,7 +3,7 @@ Base for interfacing with SQLAlchemy
 Provides the necessary plumbing for CRUD
 using SA session
 '''
-from inspector import class_keys, primary_key, KeyNotFoundException
+from .inspector import KeyNotFoundException, class_keys, primary_key
 
 
 class AlchemyModelManager(object):
@@ -33,7 +33,7 @@ class AlchemyModelManager(object):
         filter_dict = dict()
 
         if filters:
-            filter_dict = {k: v for k, v in filters.iteritems()}
+            filter_dict = {k: v for k, v in filters.items()}
             filter_dict.pop('format', None)
             filter_dict.pop('page', None)
             filter_dict.pop('sort_by', None)
@@ -85,14 +85,13 @@ class AlchemyModelManager(object):
         if not other_pks:
             newargs = list(pks)
         else:
-            newargs = list()
-            for key in class_keys(self.cls):
-                if other_pks and key in other_pks:
-                    newargs.append(other_pks[key])
+            newargs = [
+                other_pks[key]
+                for key in class_keys(self.cls) if key in other_pks
+            ]
 
             # Confirm this logic works!!!
             # will the order be correct if we just append?
-            for pk in reversed(pks):
-                newargs.append(pk)
+            newargs.extend(list(reversed(pks)))
 
         return self.session.query(self.cls).get(newargs)

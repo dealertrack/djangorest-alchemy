@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from django.core.paginator import Paginator, InvalidPage, Page
-from rest_framework.response import Response
-from rest_framework import status
 import six
+from django.core.paginator import InvalidPage, Page, Paginator
+from rest_framework import status
+from rest_framework.response import Response
+
 
 STATUS_CODES = {
     'created': status.HTTP_201_CREATED,
@@ -82,7 +83,7 @@ class MultipleObjectMixin(object):
 
 def make_action_method(name, methods, **kwargs):
     def func(self, request, pk=None, **kwargs):
-        assert hasattr(request, 'DATA'), 'request object must have DATA'
+        assert hasattr(request, 'data'), 'request object must have data'
         ' attribute'
         assert hasattr(self, 'manager_class'), 'viewset must have'
         ' manager_class defined'
@@ -92,7 +93,7 @@ def make_action_method(name, methods, **kwargs):
         mgr = self.manager_factory(context={'request': request})
         mgr_method = getattr(mgr, name)
 
-        resp = mgr_method(request.DATA, pk, **kwargs)
+        resp = mgr_method(request.data, pk, **kwargs)
 
         # no response returned back, assume everything is fine
         if not resp:
@@ -117,7 +118,7 @@ class ManagerMeta(type):
         if 'manager_class' in attrs:
             mgr_class = attrs['manager_class']
             if hasattr(mgr_class, 'action_methods'):
-                for mname, methods in mgr_class.action_methods.iteritems():
+                for mname, methods in mgr_class.action_methods.items():
                     attrs[mname] = make_action_method(mname.lower(), methods)
 
         return super(ManagerMeta, cls).__new__(cls, name, bases, attrs)

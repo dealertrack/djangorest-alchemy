@@ -2,7 +2,8 @@
 Relationship field
 '''
 from rest_framework.relations import RelatedField
-from djangorest_alchemy.inspector import primary_key, KeyNotFoundException
+
+from djangorest_alchemy.inspector import KeyNotFoundException, primary_key
 
 
 class AlchemyRelatedField(RelatedField):
@@ -11,16 +12,18 @@ class AlchemyRelatedField(RelatedField):
         self.parent_path = kwargs.pop('path')
         super(AlchemyRelatedField, self).__init__(*args, **kwargs)
 
-    def to_native(self, obj):
-        model_name = obj.__class__.__name__.lower()
+    def to_representation(self, value):
+        model_name = value.__class__.__name__.lower()
 
         # Try to get pk field
         # if not found, it's a child model
         # dependent on parent keys
         try:
-            pk_field = primary_key(obj.__class__)
-            pk_val = getattr(obj, pk_field, None)
-            return self.parent_path + model_name + 's/' + str(pk_val) + '/'
+            pk_field = primary_key(value.__class__)
+            pk_val = getattr(value, pk_field, None)
+            return ('{parent}{model}s/{pk}/'
+                    ''.format(parent=self.parent_path, model=model_name, pk=pk_val))
+
         except KeyNotFoundException:
              # Use actual model name
             return self.parent_path + model_name + 's/'
@@ -31,5 +34,5 @@ class AlchemyUriField(RelatedField):
         self.parent_path = kwargs.pop('path')
         super(AlchemyUriField, self).__init__(*args, **kwargs)
 
-    def to_native(self, obj):
-        return self.parent_path + str(obj) + '/'
+    def to_representation(self, value):
+        return '{parent}{pk}/'.format(parent=self.parent_path, pk=value)

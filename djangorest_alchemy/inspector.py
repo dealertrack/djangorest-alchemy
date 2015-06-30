@@ -8,6 +8,10 @@ class KeyNotFoundException(Exception):
     """Primary key not found exception"""
 
 
+def public_vars(cls):
+    return {k: v for k, v in vars(cls).items() if not k.startswith('_')}
+
+
 def class_keys(cls):
     """This is a utility function to get the attribute names for
     the primary keys of a class
@@ -16,7 +20,7 @@ def class_keys(cls):
     # >>> ('dealer_code', 'deal_jacket_id', 'deal_id')
     """
     reverse_map = {}
-    for name, attr in cls.__dict__.items():
+    for name, attr in public_vars(cls).items():
         try:
             reverse_map[attr.property.columns[0].name] = name
         except:
@@ -31,17 +35,15 @@ def primary_key(cls):
     of the class. In case of multiple primary keys,
     use the <classname>_id convention
     """
-    has_multiple_pk = len(class_keys(cls)) > 1
+    keys = class_keys(cls)
 
-    if has_multiple_pk:
+    if len(keys) > 1:
         # guess the pk
         pk = cls.__name__.lower() + '_id'
     else:
-        for key in class_keys(cls):
-            pk = key
-            break
+        pk = next(iter(keys), None)
 
-    if not pk in cls.__dict__:
+    if pk not in cls.__dict__:
         # could not find pk field in class, now check
         # whether it has been explicitly specified
         if 'pk_field' in cls.__dict__:
