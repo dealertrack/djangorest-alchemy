@@ -22,10 +22,11 @@ class AlchemyRelatedField(RelatedField):
             pk_field = primary_key(value.__class__)
             pk_val = getattr(value, pk_field, None)
             return ('{parent}{model}s/{pk}/'
-                    ''.format(parent=self.parent_path, model=model_name, pk=pk_val))
+                    ''.format(parent=self.parent_path,
+                              model=model_name, pk=pk_val))
 
         except KeyNotFoundException:
-             # Use actual model name
+            # Use actual model name
             return self.parent_path + model_name + 's/'
 
 

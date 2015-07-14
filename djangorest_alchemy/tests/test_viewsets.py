@@ -2,7 +2,6 @@
 Integration test cases for AlchemyModelViewSet
 Uses Django test client
 '''
-import datetime
 import unittest
 
 import mock
