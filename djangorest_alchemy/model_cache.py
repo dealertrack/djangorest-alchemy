@@ -2,8 +2,8 @@ import importlib
 import inspect
 import itertools
 import os
-import six
 
+import six
 from django.conf import settings
 
 

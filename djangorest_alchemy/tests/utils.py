@@ -2,14 +2,13 @@
 Model and manager test dummies
 '''
 
-from sqlalchemy import create_engine
-from sqlalchemy import MetaData, Table, Column, ForeignKey
-from sqlalchemy.types import INTEGER, String, DateTime, Float, BigInteger
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm import mapper
-from sqlalchemy.orm import relationship
 import datetime
+
+from sqlalchemy import Column, ForeignKey, MetaData, Table, create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import mapper, relationship, sessionmaker
+from sqlalchemy.types import INTEGER, BigInteger, DateTime, Float, String
+
 
 engine = create_engine('sqlite://', echo=False)
 
@@ -44,15 +43,15 @@ class DeclarativeModel(Base):
     datetime = Column(DateTime, default=datetime.datetime.utcnow)
     floatfield = Column(Float)
     bigintfield = Column(BigInteger)
-    child_model = relationship(ChildModel, uselist=False, primaryjoin=
-                              (declarativemodel_id == ChildModel.parent_id))
+    child_model = relationship(ChildModel, uselist=False,
+                               primaryjoin=(declarativemodel_id == ChildModel.parent_id))
 
 
-#Multiple primary keys
+# Multiple primary keys
 class CompositeKeysModel(Base):
     __tablename__ = 'composite_model'
 
-    #This order of PK definition is important
+    # This order of PK definition is important
     pk1 = Column(String, primary_key=True)
     pk2 = Column(String, primary_key=True)
     compositekeysmodel_id = Column(INTEGER, primary_key=True)

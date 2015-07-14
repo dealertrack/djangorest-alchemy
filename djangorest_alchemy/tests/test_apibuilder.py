@@ -1,6 +1,8 @@
 import unittest
-from djangorest_alchemy.apibuilder import APIModelBuilder
+
 import mock
+
+from djangorest_alchemy.apibuilder import APIModelBuilder
 
 
 class TestAPIBuilder(unittest.TestCase):

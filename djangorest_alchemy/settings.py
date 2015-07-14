@@ -9,3 +9,6 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+SECRET_KEY = "4k^rs)v0h5&8l2wiiko0x1^1ss!9fbur8_q%lb60gc&4&l!)us"
+ALLOWED_HOSTS = '*'

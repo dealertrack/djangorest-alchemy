@@ -1,5 +1,4 @@
-from rest_framework.routers import DefaultRouter
-from rest_framework.routers import Route
+from rest_framework.routers import DefaultRouter, Route
 
 
 class ReadOnlyRouter(DefaultRouter):

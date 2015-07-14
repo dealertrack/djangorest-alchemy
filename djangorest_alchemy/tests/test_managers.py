@@ -3,8 +3,10 @@
 Unit test cases for AlchemyModelManager
 '''
 import unittest
+
 from djangorest_alchemy.managers import AlchemyModelManager
-from utils import SessionMixin, DeclarativeModel
+
+from .utils import DeclarativeModel, SessionMixin
 
 
 class ModelManager(SessionMixin, AlchemyModelManager):
