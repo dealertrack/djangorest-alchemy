@@ -44,7 +44,7 @@ class DeclarativeModel(Base):
     floatfield = Column(Float)
     bigintfield = Column(BigInteger)
     child_model = relationship(ChildModel, uselist=False,
-                               primaryjoin=(declarativemodel_id == ChildModel.parent_id))
+                               primaryjoin=(declarativemodel_id == ChildModel.parent_id))  # noqa
 
 
 # Multiple primary keys
