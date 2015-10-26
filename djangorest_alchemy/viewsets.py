@@ -3,15 +3,15 @@ Base AlchemyViewSet which provides
 the necessary plumbing to interface with
 AlchemyModelSerializer and AlchemyModelManager
 '''
-from rest_framework import viewsets
-from rest_framework.response import Response
-from rest_framework import status
-from djangorest_alchemy.serializers import AlchemyModelSerializer
-from djangorest_alchemy.serializers import AlchemyListSerializer
-from djangorest_alchemy.mixins import MultipleObjectMixin
-from djangorest_alchemy.mixins import ManagerMixin
-
 from django.core.paginator import InvalidPage
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+
+from djangorest_alchemy.mixins import ManagerMixin, MultipleObjectMixin
+from djangorest_alchemy.serializers import (
+    AlchemyListSerializer,
+    AlchemyModelSerializer,
+)
 
 
 class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
@@ -27,13 +27,15 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         Override to return back your instance
         '''
         if multiple:
-            return AlchemyListSerializer(queryset,
-                                         model_class=model_class,
-                                         context=context)
+            s = AlchemyListSerializer(instance=queryset,
+                                      model_class=model_class,
+                                      context=context,
+                                      many=True)
         else:
-            return AlchemyModelSerializer(queryset,
-                                          model_class=model_class,
-                                          context=context)
+            s = AlchemyModelSerializer(instance=queryset,
+                                       model_class=model_class,
+                                       context=context)
+        return s
 
     def get_other_pks(self, request):
         '''
@@ -57,7 +59,7 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         :kwargs kwargs: URI keyword args
         :return: List e.g. [pk1, pk2]
         '''
-        return kwargs.values()
+        return list(kwargs.values())
 
     def list(self, request, **kwargs):
         '''
@@ -82,7 +84,7 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         mgr = self.manager_factory(context={'request': request})
 
         queryset = mgr.list(other_pks=self.get_other_pks(request),
-                            filters=request.QUERY_PARAMS)
+                            filters=request.query_params)
 
         count = len(queryset)
 
@@ -95,7 +97,6 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
         serializer = self.serializer_factory(True, queryset,
                                              mgr.model_class(),
                                              {'request': request})
-
         return Response({"count": count,
                          "page": self.paginate_by,
                          "results": serializer.data})
@@ -128,12 +129,3 @@ class AlchemyModelViewSet(MultipleObjectMixin, ManagerMixin, viewsets.ViewSet):
                                              mgr.model_class(),
                                              {'request': request})
         return Response(serializer.data)
-
-    def create(self, request):
-        pass
-
-    def update(self, request, pk=None):
-        pass
-
-    def destroy(self, request, pk=None):
-        pass

@@ -2,19 +2,39 @@
 Base AlchemyModelSerializer which provides the mapping between
 SQLALchemy and DRF fields to serialize/deserialize objects
 '''
-from rest_framework import serializers
-from rest_framework.fields import (CharField, IntegerField, DateTimeField,
-                                   FloatField, BooleanField, DecimalField)
-from sqlalchemy.types import (String, INTEGER, SMALLINT, BIGINT, VARCHAR,
-                              CHAR, TIMESTAMP, DATE, Float, BigInteger,
-                              Numeric, DateTime, Boolean, CLOB, DECIMAL)
 from django.utils.datastructures import SortedDict
-from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
-# inspect introduced in 0.8
-#from sqlalchemy import inspect
+from rest_framework import serializers
+from rest_framework.fields import (
+    BooleanField,
+    CharField,
+    DateTimeField,
+    DecimalField,
+    FloatField,
+    IntegerField,
+)
 from sqlalchemy.orm import class_mapper
-from inspector import primary_key, KeyNotFoundException
-from sqlalchemy.orm.properties import RelationshipProperty, ColumnProperty
+from sqlalchemy.orm.properties import ColumnProperty, RelationshipProperty
+from sqlalchemy.types import (
+    BIGINT,
+    CHAR,
+    CLOB,
+    DATE,
+    DECIMAL,
+    INTEGER,
+    SMALLINT,
+    TIMESTAMP,
+    VARCHAR,
+    BigInteger,
+    Boolean,
+    DateTime,
+    Float,
+    Numeric,
+    String,
+)
+
+from djangorest_alchemy.fields import AlchemyRelatedField, AlchemyUriField
+
+from .inspector import KeyNotFoundException, primary_key
 
 
 class AlchemyModelSerializer(serializers.Serializer):
@@ -49,7 +69,7 @@ class AlchemyModelSerializer(serializers.Serializer):
         self.cls = kwargs.pop('model_class')
         super(AlchemyModelSerializer, self).__init__(*args, **kwargs)
 
-    def get_default_fields(self):
+    def get_fields(self):
 
         ret = SortedDict()
 
@@ -60,7 +80,8 @@ class AlchemyModelSerializer(serializers.Serializer):
             # URI field for get pk field
             pk_field = primary_key(self.cls.__class__)
             ret['href'] = AlchemyUriField(source=pk_field,
-                                          path=r.build_absolute_uri(r.path))
+                                          path=r.build_absolute_uri(r.path),
+                                          read_only=True)
         except KeyNotFoundException:
             pass
 
@@ -81,16 +102,19 @@ class AlchemyModelSerializer(serializers.Serializer):
                 field_nm = str(rel_prop).split('.')[1]
                 # many becomes same as uselist so that
                 # RelatedField can iterate over the queryset
-                ret[field_nm] = AlchemyRelatedField(source=field_nm,
-                                                    many=rel_prop.uselist,
-                                                    path=r.build_absolute_uri(
-                                                        r.path))
+                kwargs = dict(
+                    path=r.build_absolute_uri(r.path),
+                    read_only=True
+                )
+                if rel_prop.uselist:
+                    kwargs['many'] = True
+                ret[field_nm] = AlchemyRelatedField(**kwargs)
 
         return ret
 
 
 class AlchemyListSerializer(AlchemyModelSerializer):
-    def get_default_fields(self):
+    def get_fields(self):
         ret = SortedDict()
 
         try:
@@ -98,10 +122,12 @@ class AlchemyListSerializer(AlchemyModelSerializer):
             pk_field = primary_key(self.cls.__class__)
 
             request = self.context['request']
-            ret["href"] = AlchemyUriField(source=pk_field,
-                                          path=request.build_absolute_uri
-                                          (request.path))
+            ret["href"] = AlchemyUriField(
+                source=pk_field,
+                path=request.build_absolute_uri(request.path),
+                read_only=True,
+            )
         except KeyNotFoundException:
-            return super(AlchemyListSerializer, self).get_default_fields()
+            return super(AlchemyListSerializer, self).get_fields()
 
         return ret

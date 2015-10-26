@@ -2,9 +2,9 @@
 API Builder
 Build dynamic API based on the provided SQLAlchemy model
 """
-from managers import AlchemyModelManager
-from viewsets import AlchemyModelViewSet
-from routers import ReadOnlyRouter
+from .managers import AlchemyModelManager
+from .routers import ReadOnlyRouter
+from .viewsets import AlchemyModelViewSet
 
 
 class APIModelBuilder(object):
